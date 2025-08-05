@@ -1,2 +1,13 @@
-# mg-chat
-An example repository on how a chat app can be built on top of Magistrala
+# Getting Started
+
+This is a Magistrala chat application built on Next JS.
+
+## Run in dev mode
+
+First, run the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
