@@ -13,7 +13,7 @@ class SuperMQWebSocket {
   ) {}
 
   connect() {
-    const url = `${this.baseUrl}/channels/${this.channelId}/messages?authorization=${this.thingSecret}`;
+    const url = `${this.baseUrl}/m/74801133-cec2-4b91-a527-368eb83783d9/c/${this.channelId}?authorization=${this.thingSecret}" <<< '[{"bn": "DS-5000-AL1-001", "n": "Distance_AssemblyLine1", "u": "mm","v": 150}, { "n": "BatteryLevel", "u": "%", "v": 95}, { "n": "SignalStrength", "u": "dBm", "v": -65}]`;
     this.socket = new WebSocket(url);
 
     this.socket.onopen = () => {
