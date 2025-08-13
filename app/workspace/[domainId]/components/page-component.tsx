@@ -38,7 +38,7 @@ export default function WorkspacePage({
                 user={user}/>
                 <UserProfile user={userInfo} />
             </div>
-            <ChatArea selectedChannel={selectedChannel} user={userInfo} domainId={domainId}/>
+            <ChatArea selectedChannel={selectedChannel} user={user} domainId={domainId}/>
         </div>
     )
 }

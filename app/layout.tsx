@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "./_components/providers/theme-provider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Chat App",
@@ -24,6 +25,12 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <Toaster
+          richColors={true}
+          expand={true}
+          visibleToasts={1}
+          closeButton={true}
+        />
       </body>
     </html>
   );

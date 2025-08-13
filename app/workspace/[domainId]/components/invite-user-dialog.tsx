@@ -30,13 +30,13 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Client, User } from "@absmach/magistrala-sdk";
 import UserSearchInput from "./user-search-input";
 import { Plus } from "lucide-react";
 import { CreateClient } from "@/lib/clients";
 import { Metadata } from "@/types/entities";
 import { UpdateUser } from "@/lib/users";
+import { toast } from "sonner";
 
 const assignMembersSchema = () =>
     z.object({
@@ -69,10 +69,10 @@ export function AssignMember({
         values: z.infer<ReturnType<typeof assignMembersSchema>>,
     ) {
         setProcessing(true);
-        // const toastId = toast("Sonner");
-        // toast.loading(t("ToastMessages.assigningUserToDomain"), {
-        //     id: toastId,
-        // });
+        const toastId = toast("Sonner");
+        toast.loading("Adding user to workspace", {
+            id: toastId,
+        });
 
         const domainRoles = await ListDomainRoles({
             queryParams: { offset: 0, limit: 10 },
@@ -80,7 +80,8 @@ export function AssignMember({
         const adminRole = domainRoles?.data?.roles?.find(
             (role) => role.name === "admin"
         );
-        const response = await AddDomainRoleMembers(adminRole?.id as string, values.userIds);
+        const response = await AddDomainRoleMembers(adminRole?.id as string, domainId, values.userIds);
+        console.log("resp", response);
 
         const userNames = await Promise.all(
             values.userIds.map(async (id) => {
@@ -95,26 +96,27 @@ export function AssignMember({
         const domainName =
             typeof domain === "object" && "name" in domain ? domain.name : domainId;
 
-        setProcessing(false);
         if (response.error === null) {
-            // toast.success(
-            //     `${t("TabNavItem.users")} "${userNames.join(", ")}" ${t(
-            //         "ToastMessages.successfullyAssignedToDomain",
-            //     )} "${domainName}"`,
-            //     {
-            //         id: toastId,
-            //     },
-            // );
+            toast.success(
+                `User(s) "${userNames.join(", ")}" added to workspace "${domainName}"`,
+                {
+                    id: toastId,
+                },
+            );
             const client: Client = {
                 name: user.credentials?.username
             }
-            const clientResult = await CreateClient(client);
+            const clientResult = await CreateClient({client, domainId});
+            console.log("clientRes", clientResult);
             if (clientResult.error === null) {
                 console.log("client created");
                 const updatedMetadata: Metadata = {
                     ...user?.metadata,
+                    ui:{
+                    ...user?.metadata?.ui,
                     clientid: clientResult?.data.id,
                     secret: clientResult?.data.credentials?.secret,
+                    }
                 };
                 const updatedUser: User = {
                     ...user,
@@ -126,16 +128,17 @@ export function AssignMember({
                     console.log("userResult", userResult);
                 }
             }
+            setProcessing(false);
             form.reset();
             setOpen(false);
         } else {
-            // toast.error(
-            //     `${t("ToastMessages.failedToAssignUserToDomain")} with error "${response.error
-            //     }"`,
-            //     {
-            //         id: toastId,
-            //     },
-            // );
+            toast.error(
+                `Failed to add user to workspace with error "${response.error
+                }"`,
+                {
+                    id: toastId,
+                },
+            );
         }
     }
     return (

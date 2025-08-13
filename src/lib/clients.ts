@@ -11,8 +11,9 @@ export interface MessagesRequestOptions {
   token?: string;
 }
 
-export const CreateClient = async (client: Client) => {
-  const { accessToken, domainId } = await validateOrGetToken("");
+export const CreateClient = async ({client, domainId}: {client: Client; domainId: string}) => {
+  const { accessToken } = await validateOrGetToken("");
+  console.log("domainId", domainId);
   try {
     const created = await mgSdk.Clients.CreateClient(
       client,

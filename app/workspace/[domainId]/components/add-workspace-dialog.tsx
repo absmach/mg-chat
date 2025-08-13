@@ -80,17 +80,27 @@ export const CreateWorkspaceForm = ({ user }: { user: User }) => {
         );
 
         const result = await CreateDomain(domain);
-        setProcessing(false);
+        const domainId = result?.data?.id as string;
+        console.log("result", result);
         if (result.error === null) {
             const client: Client = {
                 name: domain.name
             }
-            const clientResult = await CreateClient(client);
+            console.log("client", client);
+            const clientResult = await CreateClient({
+                client,
+                domainId
+            });
+            console.log("clientRes", clientResult);
             if (clientResult.error === null) {
                 console.log("client created");
                 const updatedMetadata: Metadata = {
                     ...user?.metadata,
+                    ui:{
+                    ...user?.metadata?.ui,
                     secret: clientResult?.data.credentials?.secret,
+                        clientId: clientResult?.data.id
+                    }
                 };
                 const updatedUser: User = {
                     ...user,
@@ -110,6 +120,7 @@ export const CreateWorkspaceForm = ({ user }: { user: User }) => {
                     },
                 );
             }
+            setProcessing(false);
             form.reset();
             setOpen(false);
         } else {

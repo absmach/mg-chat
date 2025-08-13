@@ -1,20 +1,19 @@
 "use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 // import { GetMessages } from "@/lib/messages";
-import { Channel, Client, SenMLMessage } from "@absmach/magistrala-sdk";
+import { Channel, Client, SenMLMessage, User } from "@absmach/magistrala-sdk";
 import { Hash, Send } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useWebSocket, WebSocketMessage } from "../../../../hooks/useWebsocket";
-import { UserInfo } from "@/types/auth";
 import { GetClients } from "@/lib/clients";
 import { AddMember } from "./add-members";
 
-export default function ChatArea({ selectedChannel, user, domainId }: { selectedChannel: Channel, user: UserInfo, domainId: string }) {
+export default function ChatArea({ selectedChannel, user, domainId }: { selectedChannel: Channel, user: User, domainId: string }) {
+    console.log("user", user);
     const [input, setInput] = useState("");
     const [clients, setClients] = useState<Client[]>([]);
     const [messages, setMessages] = useState<SenMLMessage[]>([]);
@@ -23,13 +22,15 @@ export default function ChatArea({ selectedChannel, user, domainId }: { selected
     const { isConnected, sendMessage: sendWebSocketMessage, reconnect, connectionStatus } = useWebSocket({
         domainId,
         topic: selectedChannel.name as string,
+        channelId: selectedChannel.id as string,
+        clientSecret: user?.metadata?.clientSecret,
         authorization: "aec2896f-f837-4256-a91e-a97403ee8b31",
         onMessage: (wsMessage: WebSocketMessage) => {
             console.log('Received WebSocket message:', wsMessage)
 
             if (wsMessage.type === 'typing') {
                 // Handle typing indicators
-                if (wsMessage.sender !== user.username) {
+                if (wsMessage.sender !== user?.credentials?.username) {
                     setTypingUsers(prev => {
                         if (!prev.includes(wsMessage.sender)) {
                             return [...prev, wsMessage.sender]
@@ -74,7 +75,7 @@ export default function ChatArea({ selectedChannel, user, domainId }: { selected
         if (!input.trim() || !isConnected) return
 
         // Send message via WebSocket
-        sendWebSocketMessage(input.trim(), user.username || 'User')
+        sendWebSocketMessage(input.trim(), user?.credentials?.username || 'User')
 
         // Clear input
         setInput("")

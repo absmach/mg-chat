@@ -8,7 +8,6 @@ import { Domain, User } from "@absmach/magistrala-sdk";
 import { useParams, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { CreateWorkspaceForm } from "../workspace/[domainId]/components/add-workspace-dialog";
-import { getServerSession } from "next-auth";
 
 export type Props = {
     children: ReactNode;

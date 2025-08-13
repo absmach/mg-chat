@@ -14,6 +14,8 @@ export interface WebSocketMessage {
 interface UseWebSocketProps {
   domainId: string
   topic: string
+  channelId: string
+  clientSecret: string
   authorization: string
   onMessage?: (message: WebSocketMessage) => void
   onConnect?: () => void
@@ -31,6 +33,8 @@ interface UseWebSocketReturn {
 
 export function useWebSocket({
   domainId,
+  channelId,
+  clientSecret,
   topic,
   authorization,
   onMessage,
@@ -53,7 +57,7 @@ export function useWebSocket({
     try {
       setConnectionStatus('connecting')
       const wsUrl = `ws://localhost:8186/m/${domainId}/c/${channelId}/?authorization=${clientSecret}`
-      
+      console.log("wsUrl", wsUrl);
       console.log('Connecting to WebSocket:', wsUrl)
       
       const ws = new WebSocket(wsUrl)
@@ -148,7 +152,7 @@ export function useWebSocket({
       console.error('Failed to create WebSocket connection:', error)
       setConnectionStatus('error')
     }
-  }, [topic, onMessage, onConnect, onDisconnect, onError])
+  }, [topic, onMessage, onConnect, channelId, clientSecret, domainId, onDisconnect, onError])
 
   const sendMessage = useCallback((content: string, sender: string) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {

@@ -248,9 +248,10 @@ export async function ProcessRoles(
 
 export const AddDomainRoleMembers = async (
   roleId: string,
+  domainId: string,
   members: string[],
 ) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { accessToken } = await validateOrGetToken("");
   try {
     const addedMembers = await mgSdk.Domains.AddDomainRoleMembers(
       domainId,
