@@ -1,6 +1,6 @@
 "use client";
 
-import type { Channel } from "@absmach/magistrala-sdk";
+import type { Channel, Rule } from "@absmach/magistrala-sdk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,9 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { CreateRule } from "@/lib/rules";
+import { OutputType } from "@/types/entities";
+import { toast } from "sonner";
 
 const formSchema = () =>
     z
@@ -50,42 +53,57 @@ export const CreateChannelForm = ({ groupId, disabled }: Props) => {
 
     async function onSubmit(values: z.infer<ReturnType<typeof formSchema>>) {
         setProcessing(true);
-
+        const toastId = toast("Sonner");
         const channel: Channel = {
             name: values.name,
             // biome-ignore lint/style/useNamingConvention: This is from an external library
             parent_group_id: groupId,
         };
 
-        // toast.loading(
-        //     `${t("ToastMessages.creating")} ${t("Entity.channel").toLowerCase()}...`,
-        //     {
-        //         id: toastId,
-        //     },
-        // );
+        toast.loading(
+            "Creating channel ...",
+            {
+                id: toastId,
+            },
+        );
 
         const result = await CreateChannel(channel);
         setProcessing(false);
         if (result.error === null) {
-            // toast.success(
-            //     `${t("Entity.channel")}  "${result.data.name}" ${t(
-            //         "ToastMessages.createdSuccessfully",
-            //     )}`,
-            //     {
-            //         id: toastId,
-            //     },
-            // );
+            toast.success(
+                `Channel "${result.data.name}" 
+                    "created successfully",
+                )}`,
+                {
+                    id: toastId,
+                },
+            );
+            const rule: Rule = {
+                input_channel: result.data.id,
+                input_topic: "",
+                outputs: [{ type: OutputType.SAVE_SENML }],
+                logic: {
+                    type: 0,
+                    value: '\n' +
+                        '        function logicFunction()\n' +
+                        '  return message.payload\n' +
+                        'end\n' +
+                        '\n' +
+                        'return logicFunction()\n' +
+                        '      '
+                },
+                name: `${result.data.name}save_messages`,
+            }
+            await CreateRule(rule);
             form.reset();
             setOpen(false);
         } else {
-            // toast.error(
-            //     `${t("ToastMessages.failedToCreate")}${t(
-            //         "Entity.channel",
-            //     )} with error "${result.error}"`,
-            //     {
-            //         id: toastId,
-            //     },
-            // );
+            toast.error(
+                `Failed to create channel with error "${result.error}"`,
+                {
+                    id: toastId,
+                },
+            );
         }
     }
 

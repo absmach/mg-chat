@@ -3,6 +3,7 @@
 import type {
   MemberRolesPage,
   PageMetadata,
+  User,
 } from "@absmach/magistrala-sdk";
 import {
   type RequestOptions,
@@ -14,6 +15,24 @@ import {
   type Member,
 } from "@/types/entities";
 import type { HttpError } from "@/types/errors";
+import { revalidatePath } from "next/cache";
+
+export const GetUsers = async ({ token = "", queryParams }: RequestOptions) => {
+  try {
+    const { accessToken } = await validateOrGetToken(token);
+    const users = await mgSdk.Users.Users(queryParams, accessToken);
+    return {
+      data: users,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  }
+};
 
 export const UserProfile = async (token?: string) => {
   try {
@@ -125,3 +144,38 @@ export async function ProcessEntityMembers(
   }
 }
 
+export const SearchUsers = async (queryParams: PageMetadata) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    const users = await mgSdk.Users.SearchUsers(queryParams, accessToken);
+    return {
+      data: users,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  }
+};
+
+export const UpdateUser = async (user: User) => {
+  const { domainId, accessToken } = await validateOrGetToken("");
+  try {
+    const updated = await mgSdk.Users.Update(user, accessToken);
+    return {
+      data: updated.credentials?.username as string,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath(`/workspace/${domainId}`);
+  }
+};

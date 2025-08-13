@@ -4,20 +4,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Member } from "@/types/entities";
-import { Channel } from "@absmach/magistrala-sdk";
+import { Channel, User } from "@absmach/magistrala-sdk";
 
 import { ChevronDown, ChevronRight, Hash, Plus } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { CreateChannelForm } from "./add-channel-dialog";
+import { AssignMember } from "./invite-user-dialog";
 
 interface ChatContainerProps {
     channels: Channel[];
     members: Member[];
     selectedChannel: Channel;
+    domainId: string;
     setSelectedChannel: Dispatch<SetStateAction<Channel>>;
+    user: User;
 }
 
-export default function ChatContainer({ channels, members, selectedChannel, setSelectedChannel }: ChatContainerProps) {
+export default function ChatContainer({ channels, members, selectedChannel, setSelectedChannel, domainId, user }: ChatContainerProps) {
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['channels', 'members']))
     const toggleSection = (section: string) => {
         const newExpanded = new Set(expandedSections)
@@ -48,7 +51,7 @@ export default function ChatContainer({ channels, members, selectedChannel, setS
 
                     {expandedSections.has('channels') && (
                         <div className="ml-4 space-y-1 mt-2">
-                            {channels.map((channel) => (
+                            {channels?.map((channel) => (
                                 <Button
                                     key={channel.id}
                                     variant={selectedChannel === channel.name ? "secondary" : "ghost"}
@@ -84,12 +87,12 @@ export default function ChatContainer({ channels, members, selectedChannel, setS
                             <ChevronRight className="h-4 w-4 mr-1" />
                         )}
                         {/* <Users className="h-4 w-4 mr-1" /> */}
-                        Members ({members.length})
+                        Members ({members?.length ?? 0})
                     </Button>
 
                     {expandedSections.has('members') && (
                         <div className="ml-4 space-y-2 mt-2">
-                            {members.map((member, index) => (
+                            {members?.map((member, index) => (
                                 <div key={index} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100">
                                     <div className="relative">
                                         <Avatar className="w-6 h-6">
@@ -105,6 +108,7 @@ export default function ChatContainer({ channels, members, selectedChannel, setS
                                     </span>
                                 </div>
                             ))}
+                            <AssignMember domainId={domainId} user={user}/>
                         </div>
                     )}
                 </div>

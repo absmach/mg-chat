@@ -72,7 +72,7 @@ const Loginform = ({ basePath }: { basePath: string }) => {
                                         disabled={processing}
                                         placeholder="Enter email or username"
                                         {...field}
-                                        className="text-popover-foreground bg-background"
+                                        className="text-black"
                                     />
                                 </FormControl>
                                 <FormMessage>{error?.message}</FormMessage>
@@ -92,7 +92,7 @@ const Loginform = ({ basePath }: { basePath: string }) => {
                                             type={seePassword ? "text" : "password"}
                                             placeholder={"Enter password"}
                                             {...field}
-                                            className={"text-card-foreground"}
+                                            className="text-black"
                                         />
                                         <Button
                                             type="button"

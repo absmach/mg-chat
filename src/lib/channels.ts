@@ -22,6 +22,7 @@ export const CreateChannel = async (channel: Channel) => {
       error: null,
     };
   } catch (err: unknown) {
+
     const knownError = err as HttpError;
     return {
       data: null,
@@ -38,17 +39,13 @@ interface ChannelsProps {
 }
 
 export const GetChannels = async ({ queryParams, domainId }: ChannelsProps) => {
-  console.log("GetChannels called!");
   const { accessToken } = await validateOrGetToken("");
   try {
-    console.log("try inside!")
-    console.log("domainId", domainId);
     const channels = await mgSdk.Channels.Channels(
       queryParams,
       domainId,
       accessToken,
     );
-    console.log("chan", channels);
     return {
       data: channels,
       error: null,

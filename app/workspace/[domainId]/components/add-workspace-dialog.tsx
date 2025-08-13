@@ -1,6 +1,6 @@
 "use client";
 
-import type { Domain } from "@absmach/magistrala-sdk";
+import type { Client, Domain, User } from "@absmach/magistrala-sdk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CreateDomain } from "@/lib/domains";
+import { CreateClient } from "@/lib/clients";
+import { UpdateUser } from "@/lib/users";
+import { Metadata } from "@/types/entities";
+import { toast } from "sonner";
 
 const routeRegex = /^[a-zA-Z][a-zA-Z0-9_-]{0,35}$/;
 
@@ -48,7 +52,7 @@ const formSchema = () =>
                 }),
         });
 
-export const CreateWorkspaceForm = () => {
+export const CreateWorkspaceForm = ({ user }: { user: User }) => {
     const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
         resolver: zodResolver(formSchema()),
         defaultValues: {
@@ -61,41 +65,60 @@ export const CreateWorkspaceForm = () => {
 
     async function onSubmit(values: z.infer<ReturnType<typeof formSchema>>) {
         setProcessing(true);
+        const toastId = toast("Sooner");
 
         const domain: Domain = {
             name: values.name,
             route: values.route,
         };
 
-        // toast.loading(
-        //     `${t("ToastMessages.creating")} ${t("Entity.channel").toLowerCase()}...`,
-        //     {
-        //         id: toastId,
-        //     },
-        // );
+        toast.loading(
+            `Creating workspace ...`,
+            {
+                id: toastId,
+            },
+        );
 
         const result = await CreateDomain(domain);
         setProcessing(false);
         if (result.error === null) {
-            // toast.success(
-            //     `${t("Entity.channel")}  "${result.data.name}" ${t(
-            //         "ToastMessages.createdSuccessfully",
-            //     )}`,
-            //     {
-            //         id: toastId,
-            //     },
-            // );
+            const client: Client = {
+                name: domain.name
+            }
+            const clientResult = await CreateClient(client);
+            if (clientResult.error === null) {
+                console.log("client created");
+                const updatedMetadata: Metadata = {
+                    ...user?.metadata,
+                    secret: clientResult?.data.credentials?.secret,
+                };
+                const updatedUser: User = {
+                    ...user,
+                    metadata: updatedMetadata,
+                };
+                console.log("updtuser", updatedUser);
+                const userResult = await UpdateUser(updatedUser);
+                if (userResult.error === null) {
+                    console.log("userResult", userResult);
+                }
+
+                toast.success(
+                    `Workspace  "${result.data.name}" 
+                        created successfully.`,
+                    {
+                        id: toastId,
+                    },
+                );
+            }
             form.reset();
             setOpen(false);
         } else {
-            // toast.error(
-            //     `${t("ToastMessages.failedToCreate")}${t(
-            //         "Entity.channel",
-            //     )} with error "${result.error}"`,
-            //     {
-            //         id: toastId,
-            //     },
-            // );
+            toast.error(
+                `Failed to create workspace with error "${result.error}"`,
+                {
+                    id: toastId,
+                },
+            );
         }
     }
 
@@ -110,7 +133,7 @@ export const CreateWorkspaceForm = () => {
                 <DialogHeader>
                     <DialogTitle>Create a workspace</DialogTitle>
                     <DialogDescription>
-                       A workspace is a shared hub where you and your team can work together.
+                        A workspace is a shared hub where you and your team can work together.
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>

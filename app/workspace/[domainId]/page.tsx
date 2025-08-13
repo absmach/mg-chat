@@ -1,10 +1,12 @@
 
 import { getServerSession } from "@/lib/nextauth";
-import { Channel } from "@absmach/magistrala-sdk";
-import { ListDomainUsers } from "@/lib/domains";
+import { Channel, User } from "@absmach/magistrala-sdk";
+import { ListDomainUsers, ViewDomain } from "@/lib/domains";
 import { GetChannels } from "@/lib/channels";
 import { Member } from "@/types/entities";
 import WorkspacePage from "./components/page-component";
+import { UserProfile } from "@/lib/users";
+import { Session } from "next-auth";
 
 type Props = {
     params: Promise<{ domainId: string }>;
@@ -23,17 +25,24 @@ export default async function Workspace({params}: Props) {
         domainId,
     });
     const memResponse = await ListDomainUsers({
-        queryParams: {
+       queryParams: {
             offset: 0,
             limit: 10,
+            status: "enabled",
             dir: "desc",
         },
-        domainId,
-    });
+   });
+    const domainResponse = await ViewDomain (domainId);
+    const user = await UserProfile((session as Session).accessToken);
+
     return (
         <WorkspacePage 
         channels={chanResponse.data?.channels as Channel[]} 
         members={memResponse.data?.members as Member[]}
-        user={session.user} />
+        userInfo={session.user} 
+        domainId={domainId}
+        domainName={domainResponse.data?.name as string}
+        user={user?.data as User}
+        />
     )
 }

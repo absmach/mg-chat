@@ -4,19 +4,21 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Domain } from "@absmach/magistrala-sdk";
+import { Domain, User } from "@absmach/magistrala-sdk";
 import { useParams, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { CreateWorkspaceForm } from "../workspace/[domainId]/components/add-workspace-dialog";
+import { getServerSession } from "next-auth";
 
 export type Props = {
     children: ReactNode;
     domains: Domain[];
+    user: User;
 };
 
 
 export default function RootLayout({
-    children, domains }: Props) {
+    children, domains, user }: Props) {
     const router = useRouter();
     const params = useParams();
     const currentDomainId = params?.domainId as string;
@@ -30,7 +32,7 @@ export default function RootLayout({
                 <TooltipProvider>
                     <ScrollArea className="flex-1 w-full">
                         <div className="flex flex-col items-center space-y-2 px-2">
-                            {domains.map((domain) => (
+                            {domains?.map((domain) => (
                                 <Tooltip key={domain.id}>
                                     <TooltipTrigger asChild>
                                         <Button
@@ -57,7 +59,7 @@ export default function RootLayout({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <CreateWorkspaceForm />
+                                    <CreateWorkspaceForm user={user}/>
                                 </TooltipTrigger>
                                 <TooltipContent side="right">
                                     <p>Add Workspace</p>
