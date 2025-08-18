@@ -1,4 +1,4 @@
-import { Get } from "@/token/token";
+import { Get } from "@/lib/token";
 import type { NextRequest } from "next/server";
 
 // Remove _resp: NextResponse parameter since it's not needed

@@ -1,9 +1,9 @@
 import { encodeSessionToken, getTokenExpiry } from "@/lib/nextauth";
-import { UserProfile } from "@/lib/users";
 import { absoluteUrl, generateUrl } from "@/lib/utils";
 import type { UserInfo } from "@/types/auth";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import { UserProfile } from "@/lib/users";
 
 export async function Get(req: NextRequest) {
   const cookiesStore = await cookies();
@@ -12,7 +12,7 @@ export async function Get(req: NextRequest) {
 
   const response = await UserProfile(accessToken);
   if (response.error !== null) {
-    return NextResponse.redirect(`/login?error=${response.error}`);
+    return NextResponse.redirect(`/auth?error=${response.error}`);
   }
 
   const user = response.data;
@@ -47,7 +47,7 @@ export async function Get(req: NextRequest) {
     urlPath.protocol,
     urlPath.host,
     port,
-    process.env.MG_UI_BASE_PATH || "/",
+    process.env.BASE_PATH || "/"
   );
 
   cookiesStore.set({
