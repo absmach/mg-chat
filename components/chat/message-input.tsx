@@ -46,7 +46,6 @@ export function MessageInput({ onSendMessage }: MessageInputProps) {
 
   return (
     <div className="space-y-2">
-      {/* Attachments preview */}
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {attachments.map((file, index) => (

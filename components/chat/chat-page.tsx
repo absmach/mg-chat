@@ -29,7 +29,6 @@ export default function ChatPage({ session }: Props) {
         />
       </div>
 
-      {/* Main chat area */}
       <div className="flex-1 flex flex-col">
         <ChatView
           selectedChannel={selectedChannel}

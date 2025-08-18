@@ -11,6 +11,7 @@ import { Member } from "@/types/entities";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
 import { UserProfile } from "@/lib/users";
+import { GetMessages } from "@/lib/messages";
 
 interface Props {
   selectedChannel: string | null;
@@ -31,6 +32,7 @@ export function ChatView({
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [membersTotal, setMembersTotal] = useState(0);
+  const [chanMessages, setChanMessages] = useState(messages);
 
   useEffect(() => {
     const connectSocket = async () => {
@@ -95,6 +97,20 @@ export function ChatView({
     }
   };
 
+  useEffect(() => {
+    const getMessage = async () => {
+      const response = await GetMessages({
+        id: channelInfo?.id as string,
+        queryParams: { offset: 0, limit: 100, protocol: "websocket" }
+      });
+      if (response.data) {
+        console.log("messages", response.data.messages);
+        setChanMessages(response.data.messages);
+      }
+    };
+    getMessage();
+  }, [channelInfo?.id]);
+
 
   if (!selectedChannel && !selectedDM) {
     return (
@@ -145,7 +161,7 @@ export function ChatView({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
         ) : (
-          <MessageList messages={messages} />
+          <MessageList messages={chanMessages} />
         )}
 
         <div className="border-t p-4">

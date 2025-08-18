@@ -9,7 +9,7 @@ import { EmojiPicker } from "./emoji-picker";
 import { SenMLMessage } from "@absmach/magistrala-sdk";
 
 interface MessageItemProps {
-  message: SenMLMessage;
+  message: any;
   showAvatar: boolean;
   onReaction?: (messageId: string, emoji: string) => void;
 }
@@ -47,7 +47,7 @@ export function MessageItem({
         ) : (
           <div className="w-8 h-8 flex items-center justify-center">
             <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100">
-              {new Date((message.time as number) / 1000000).toLocaleTimeString(
+              {new Date((message.t as number) / 1000000).toLocaleTimeString(
                 [],
                 {
                   hour: "2-digit",
@@ -67,7 +67,7 @@ export function MessageItem({
           </div>
         )} */}
 
-        <div className="text-gray-900 break-words">{message.string_value}</div>
+        <div className="text-gray-900 break-words">{message.vs}</div>
 
         {/* Attachments */}
         {/* {message.attachments && message.attachments.length > 0 && (
