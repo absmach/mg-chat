@@ -13,6 +13,7 @@ import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
 import { Channel } from "@absmach/magistrala-sdk";
 import { set } from "date-fns";
+import { Metadata } from "@/types/entities";
 
 interface Props {
   session: Session;
@@ -20,6 +21,7 @@ interface Props {
   selectedDM: string | null;
   setSelectedChannel: (channelId: string | null) => void;
   setSelectedDM: (userId: string | null) => void;
+  metadata: Metadata;
 }
 
 export function Sidebar({
@@ -28,6 +30,7 @@ export function Sidebar({
   selectedDM,
   setSelectedChannel,
   setSelectedDM,
+  metadata,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
@@ -108,7 +111,7 @@ export function Sidebar({
               <span className="text-sm font-medium text-gray-300">
                 Channels
               </span>
-              <CreateChannelDialog setRevalidate={setRevalidate} />
+              <CreateChannelDialog setRevalidate={setRevalidate} metadata={metadata}/>
             </div>
 
             <div className="space-y-1">

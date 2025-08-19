@@ -4,11 +4,13 @@ import { Sidebar } from "@/components/chat/sidebar/sidebar";
 import { ChatView } from "@/components/chat/chat-view";
 import { Session } from "@/types/auth";
 import { useState } from "react";
+import { Metadata } from "@/types/entities";
 
 interface Props {
   session: Session;
+  metadata: Metadata;
 }
-export default function ChatPage({ session }: Props) {
+export default function ChatPage({ session, metadata }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(null);
 
@@ -26,6 +28,7 @@ export default function ChatPage({ session }: Props) {
           selectedDM={selectedDM}
           setSelectedChannel={setSelectedChannel}
           setSelectedDM={setSelectedDM}
+          metadata={metadata}
         />
       </div>
 

@@ -19,11 +19,13 @@ import { CreateChannel } from "@/lib/channels";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateRule } from "@/lib/rules";
-import { OutputType } from "@/types/entities";
+import { Metadata, OutputType } from "@/types/entities";
+import { ConnectClients } from "@/lib/clients";
 interface Props {
   setRevalidate: (value: boolean) => void;
+  metadata: Metadata;
 }
-export function CreateChannelDialog({ setRevalidate }: Props) {
+export function CreateChannelDialog({ setRevalidate, metadata }: Props) {
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +46,10 @@ export function CreateChannelDialog({ setRevalidate }: Props) {
     if (response.error !== null) {
       toast.error(`Failed to create channel with error: ${response.error}`);
     } else {
+      const connectResp = await ConnectClients([metadata?.ui?.client?.id as string], response.data.id as string, ["publish", "subscribe"]);
+      if(connectResp.error !== null){
+        toast.error(`Failed to connect channel ${response.data.name} to client`)
+      } else {
       const rule: Rule = {
         input_channel: response.data.id,
         input_topic: "",
@@ -69,7 +75,7 @@ export function CreateChannelDialog({ setRevalidate }: Props) {
         toast.success("Channel created successfully");
         setName("");
         setOpen(false);
-      }
+      }}
     }
     setIsLoading(false);
   };
