@@ -1,3 +1,5 @@
+"use server";
+
 import { ClientBasicInfo, MessagesPage, MessagesPageMetadata, SenMLMessage } from "@absmach/magistrala-sdk";
 import { mgSdk, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
@@ -31,7 +33,6 @@ export const GetMessages = async ({
       error: null,
     };
   } catch (err: unknown) {
-    console.log("err", err);
     const knownError = err as HttpError;
     return {
       data: null,
@@ -45,7 +46,6 @@ async function processMessages(
   token: string,
 ): Promise<SenMLMessage[]> {
   const processedMessages: SenMLMessage[] = [];
-  console.log("messages", messages);
   if (messages && messages.length > 0) {
     for (const message of messages) {
       try {

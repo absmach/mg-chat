@@ -3,7 +3,9 @@
 import { SenMLMessage } from "@absmach/magistrala-sdk";
 import {
   createContext,
+  Dispatch,
   ReactNode,
+  SetStateAction,
   useContext,
   useEffect,
   useRef,
@@ -12,6 +14,7 @@ import {
 
 type WebSocketContextType = {
   messages: SenMLMessage[];
+  setMessages: Dispatch<SetStateAction<SenMLMessage[]>>;
   sendMessage: (msg: object) => void;
   connect: (domainId: string, channelId: string, clientSecret: string) => void;
   disconnect: () => void;
@@ -95,7 +98,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <WebSocketContext.Provider
-      value={{ messages, sendMessage, connect, disconnect }}
+      value={{ messages, setMessages, sendMessage, connect, disconnect }}
     >
       {children}
     </WebSocketContext.Provider>

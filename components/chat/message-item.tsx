@@ -7,17 +7,20 @@ import { formatDistanceToNow } from "date-fns";
 import { Smile, Download, FileText, ImageIcon } from "lucide-react";
 import { EmojiPicker } from "./emoji-picker";
 import { SenMLMessage } from "@absmach/magistrala-sdk";
+import { cn } from "@/lib/utils";
 
 interface MessageItemProps {
   message: any;
   showAvatar: boolean;
   onReaction?: (messageId: string, emoji: string) => void;
+  className?: string;
 }
 
 export function MessageItem({
   message,
   showAvatar,
   onReaction,
+  className,
 }: MessageItemProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -37,7 +40,12 @@ export function MessageItem({
   };
 
   return (
-    <div className="group flex space-x-3 hover:bg-gray-50 px-2 py-1 rounded">
+    <div
+      className={cn(
+        "group flex space-x-3  px-2 py-1 border rounded-md",
+        className
+      )}
+    >
       <div className="flex-shrink-0">
         {showAvatar ? (
           <Avatar className="h-8 w-8">
@@ -46,14 +54,13 @@ export function MessageItem({
           </Avatar>
         ) : (
           <div className="w-8 h-8 flex items-center justify-center">
-            <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100">
-              {new Date((message.t as number) / 1000000).toLocaleTimeString(
-                [],
-                {
+              <span className="text-xs ">
+                {new Date(
+                  (message.t || (message.time as number)) / 1000000
+                ).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
-                }
-              )}
+                })}
             </span>
           </div>
         )}
@@ -67,7 +74,9 @@ export function MessageItem({
           </div>
         )} */}
 
-        <div className="text-gray-900 break-words">{message.vs}</div>
+        <div className="text-gray-900 break-words">
+          {message.vs || message.string_value}
+        </div>
 
         {/* Attachments */}
         {/* {message.attachments && message.attachments.length > 0 && (

@@ -26,17 +26,35 @@ export function ChatView({
   selectedDM,
   session,
 }: Props) {
-  const { messages, sendMessage, connect } = useWebSocket();
+  const { messages, setMessages, sendMessage, connect } = useWebSocket();
   const { domain } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [membersTotal, setMembersTotal] = useState(0);
   const [chanMessages, setChanMessages] = useState(messages);
+  const [clientId, setClientId] = useState("");
+  useEffect(() => {
+    if (channelInfo?.id) {
+      const getMessages = async () => {
+        const response = await GetMessages({
+          id: channelInfo?.id as string,
+          queryParams: { offset: 0, limit: 100 },
+        });
+
+        if (response.data) {
+          setMessages(response.data.messages);
+        }
+      };
+
+      getMessages();
+    }
+  }, [channelInfo?.id]);
 
   useEffect(() => {
     const connectSocket = async () => {
       const userProfile = await UserProfile();
+      setClientId(userProfile.data?.metadata?.ui.client.id);
       if (userProfile.data !== null) {
         connect(
           domain?.id as string,
@@ -56,6 +74,7 @@ export function ChatView({
       if (response.data) {
         if (!selectedChannel) {
           const chan = (response.data as ChannelsPage).channels?.[0];
+
           setSelectedChannel(chan?.id as string);
           setChannelInfo(chan);
         } else {
@@ -69,30 +88,13 @@ export function ChatView({
     getData();
   }, [selectedChannel, setSelectedChannel]);
 
-  useEffect(() => {
-    const getData = async () => {
-      const response = await ListChannelMembers({
-        queryParams: { offset: 0, limit: 100 },
-        id: channelInfo?.id,
-      });
-      if (response.data) {
-        setMembers(response.data.members);
-        setMembersTotal(response.data.total);
-      } else {
-        setMembers([]);
-        setMembersTotal(0);
-      }
-    };
-
-    getData();
-  }, [channelInfo?.id]);
-
   const handleSend = (input: string) => {
     if (input.trim()) {
       sendMessage({
         n: "chat",
         vs: input,
-        t: Date.now() / 1000,
+        t: Date.now() * 1e6,
+        publisher: clientId,
       });
     }
   };
@@ -104,7 +106,6 @@ export function ChatView({
         queryParams: { offset: 0, limit: 100, protocol: "websocket" }
       });
       if (response.data) {
-        console.log("messages", response.data.messages);
         setChanMessages(response.data.messages);
       }
     };
@@ -161,10 +162,10 @@ export function ChatView({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
         ) : (
-          <MessageList messages={chanMessages} />
+          <MessageList messages={messages} clientId={clientId} />
         )}
 
-        <div className="border-t p-4">
+        <div className="border p-6 m-4 rounded-md">
           <MessageInput onSendMessage={handleSend} />
         </div>
       </div>
