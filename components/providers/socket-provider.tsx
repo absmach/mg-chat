@@ -1,6 +1,7 @@
 "use client";
 
 import { SenMLMessage } from "@absmach/magistrala-sdk";
+import { useSession } from "next-auth/react";
 import {
   createContext,
   Dispatch,
@@ -16,7 +17,7 @@ type WebSocketContextType = {
   messages: SenMLMessage[];
   setMessages: Dispatch<SetStateAction<SenMLMessage[]>>;
   sendMessage: (msg: object) => void;
-  connect: (domainId: string, channelId: string, clientSecret: string) => void;
+  connect: (domainId: string, channelId: string) => void;
   disconnect: () => void;
 };
 
@@ -27,13 +28,14 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<SenMLMessage[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
+  const user = useSession();
+  const token = user?.data?.accessToken;
 
   const connect = (
     domainId: string,
     channelId: string,
-    clientSecret: string
   ) => {
-    const wsUrl = `ws://localhost:8186/m/${domainId}/c/${channelId}?authorization=${clientSecret}`;
+    const wsUrl = `ws://localhost:8186/m/${domainId}/c/${channelId}?authorization=Bearer%20${token}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {

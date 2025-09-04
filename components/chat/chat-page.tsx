@@ -4,15 +4,17 @@ import { Sidebar } from "@/components/chat/sidebar/sidebar";
 import { ChatView } from "@/components/chat/chat-view";
 import { Session } from "@/types/auth";
 import { useState } from "react";
-import { Metadata } from "@/types/entities";
+import { Member, Metadata } from "@/types/entities";
 
 interface Props {
   session: Session;
   metadata: Metadata;
+  members: Member[];
 }
-export default function ChatPage({ session, metadata }: Props) {
+export default function ChatPage({ session, metadata, members }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(null);
+  const domainId = session.domain?.id;
 
   return (
     <>
@@ -29,6 +31,7 @@ export default function ChatPage({ session, metadata }: Props) {
           setSelectedChannel={setSelectedChannel}
           setSelectedDM={setSelectedDM}
           metadata={metadata}
+          members={members}
         />
       </div>
 
@@ -38,6 +41,7 @@ export default function ChatPage({ session, metadata }: Props) {
           setSelectedChannel={setSelectedChannel}
           selectedDM={selectedDM}
           session={session}
+          domainId={domainId as string}
         />
       </div>
     </>
