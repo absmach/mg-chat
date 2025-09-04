@@ -8,13 +8,13 @@ import { SenMLMessage } from "@absmach/magistrala-sdk";
 interface MessageListProps {
   messages: SenMLMessage[];
   onReaction?: (messageId: string, emoji: string) => void;
-  clientId?: string;
+  userId?: string;
 }
 
 export function MessageList({
   messages,
   onReaction,
-  clientId,
+  userId,
 }: MessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +35,7 @@ export function MessageList({
       <div className="space-y-4 py-4">
         {messages.map((message, index) => {
           const previousMessage = messages[index - 1];
-          const isMine = message.publisher === clientId;
+          const isMine = message.publisher === userId;
           // const showAvatar =
           //   !previousMessage ||
           //   previousMessage.author.id !== message.author.id ||

@@ -11,9 +11,10 @@ import { Session } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
-import { Channel } from "@absmach/magistrala-sdk";
+import { Channel, Client, User } from "@absmach/magistrala-sdk";
 import { set } from "date-fns";
-import { Metadata } from "@/types/entities";
+import { Member, Metadata } from "@/types/entities";
+import { InviteMember } from "../invite-user-dialog";
 
 interface Props {
   session: Session;
@@ -22,6 +23,7 @@ interface Props {
   setSelectedChannel: (channelId: string | null) => void;
   setSelectedDM: (userId: string | null) => void;
   metadata: Metadata;
+  members: Member[];
 }
 
 export function Sidebar({
@@ -31,18 +33,17 @@ export function Sidebar({
   setSelectedChannel,
   setSelectedDM,
   metadata,
+  members,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
   const [directMessages, setDirectMessages] = useState<Channel[]>([]);
-  const [showCreateChannel, setShowCreateChannel] = useState(false);
-  const [showInviteUser, setShowInviteUser] = useState(false);
 
   const workspaceId = session.domain?.id;
 
   const getData = useCallback(async () => {
     const groupResponse = await ListChannels({
-      queryParams: { offset: 0, limit: 100, tag: "group" },
+      queryParams: { offset: 0, limit: 100, tag: "chat" },
     });
     if (groupResponse.data) {
       setChannels(groupResponse.data.channels);
@@ -64,7 +65,7 @@ export function Sidebar({
     if (workspaceId) {
       getData();
     }
-  }, [workspaceId]);
+  }, [workspaceId, getData]);
 
   useEffect(() => {
     if (revalidate) {
@@ -80,7 +81,6 @@ export function Sidebar({
   const domain = session.domain;
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
-      {/* Workspace Header */}
       <div className="p-4 border-b border-gray-700">
         <Button
           variant="ghost"
@@ -105,7 +105,6 @@ export function Sidebar({
 
       <ScrollArea className="flex-1">
         <div className="p-2">
-          {/* Channels Section */}
           <div className="mb-6">
             <div className="flex items-center justify-between px-2 py-1 mb-2">
               <span className="text-sm font-medium text-gray-300">
@@ -116,6 +115,7 @@ export function Sidebar({
 
             <div className="space-y-1">
               {channels?.map((channel) => (
+                <div key={channel?.id} className="flex justify-between">
                 <Button
                   key={channel.id}
                   variant="ghost"
@@ -131,39 +131,24 @@ export function Sidebar({
                 >
                   <Hash className="h-4 w-4 mr-2" />
                   <span className="text-sm">{channel.name}</span>
-                  {/* {channel.unreadCount > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="ml-auto h-5 text-xs"
-                    >
-                      {channel.unreadCount}
-                    </Badge>
-                  )} */}
                 </Button>
+                </div>
               ))}
             </div>
           </div>
 
           <Separator className="my-4 bg-gray-700" />
 
-          {/* Direct Messages Section */}
           <div className="mb-6">
             <div className="flex items-center justify-between px-2 py-1 mb-2">
               <span className="text-sm font-medium text-gray-300">
                 Direct Messages
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
-                onClick={() => setShowInviteUser(true)}
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
+              <InviteMember domainId={session?.domain?.id as string}/>
             </div>
 
-            {/* <div className="space-y-1">
-              {directMessages?.map((dmUser) => {
+            <div className="space-y-1">
+              {members?.map((dmUser) => {
                 
                 return (
                   <Button
@@ -182,28 +167,27 @@ export function Sidebar({
                     <div className="relative mr-2">
                       <Avatar className="h-6 w-6">
                         <AvatarImage
-                          src={dmUser.avatar || "/placeholder.svg"}
+                          src={dmUser.profile_picture}
                         />
                         <AvatarFallback className="text-xs bg-gray-600 text-white">
-                          {dmUser.name.charAt(0)}
+                          {(dmUser.credentials?.username as string).charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <div
+                      {/* <div
                         className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-gray-800 ${
                           dmUser.isOnline ? "bg-green-500" : "bg-gray-400"
                         }`}
-                      />
+                      /> */}
                     </div>
-                    <span className="text-sm truncate">{dmUser.name}</span>
+                    <span className="text-sm truncate">{dmUser.credentials?.username}</span>
                   </Button>
                 );
               })}
-            </div> */}
+            </div>
           </div>
         </div>
       </ScrollArea>
 
-      {/* User Profile */}
       <NavUser session={session} />
     </div>
   );
