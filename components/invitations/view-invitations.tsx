@@ -119,14 +119,10 @@ export function NotificationsBell({ invitation }: { invitation: Invitation[] }) 
                                                     disabled={processing}
                                                     className="h-7 px-3 text-xs"
                                                 >
-                                                    {processing === true ? (
-                                                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                                    ) : (
-                                                        <>
-                                                            <Check className="h-3 w-3 mr-1" />
-                                                            Accept
-                                                        </>
-                                                    )}
+                                                    <>
+                                                        <Check className="h-3 w-3 mr-1" />
+                                                        Accept
+                                                    </>
                                                 </Button>
 
                                                 <Button
@@ -136,14 +132,10 @@ export function NotificationsBell({ invitation }: { invitation: Invitation[] }) 
                                                     disabled={processing}
                                                     className="h-7 px-3 text-xs"
                                                 >
-                                                    {processing === true ? (
-                                                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                                    ) : (
-                                                        <>
-                                                            <X className="h-3 w-3 mr-1" />
-                                                            Decline
-                                                        </>
-                                                    )}
+                                                    <>
+                                                        <X className="h-3 w-3 mr-1" />
+                                                        Decline
+                                                    </>
                                                 </Button>
                                             </div>
                                         </div>
