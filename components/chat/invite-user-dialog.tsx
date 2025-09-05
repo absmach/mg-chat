@@ -110,8 +110,9 @@ export function InviteMember({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild={true}>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" className="w-full mt-2 justify-start">
                     <Plus className="h-3 w-3" />
+                    <span>Invite User</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="rounded-md w-[90%] max-w-md">

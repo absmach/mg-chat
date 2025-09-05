@@ -144,7 +144,6 @@ export function Sidebar({
               <span className="text-sm font-medium text-gray-300">
                 Direct Messages
               </span>
-              <InviteMember domainId={session?.domain?.id as string}/>
             </div>
 
             <div className="space-y-1">
@@ -184,6 +183,7 @@ export function Sidebar({
                 );
               })}
             </div>
+            <InviteMember domainId={workspaceId as string} />
           </div>
         </div>
       </ScrollArea>
