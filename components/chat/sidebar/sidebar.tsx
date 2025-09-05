@@ -158,10 +158,6 @@ export function Sidebar({
                         ? "bg-purple-600 text-white hover:bg-purple-700"
                         : ""
                     }`}
-                    onClick={() => {
-                      setSelectedChannel(null);
-                      setSelectedDM(dmUser.id as string);
-                    }}
                   >
                     <div className="relative mr-2">
                       <Avatar className="h-6 w-6">
