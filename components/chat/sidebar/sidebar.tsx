@@ -80,6 +80,8 @@ export function Sidebar({
   };
 
   const domain = session.domain;
+  console.log("selectedDM", selectedDM);
+  console.log("logged in user", session?.user?.id)
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
       <div className="p-4 border-b flex items-center justify-between border-gray-700">
@@ -152,6 +154,7 @@ export function Sidebar({
               {members?.map((dmUser) => {
                 
                 return (
+                  <>
                   <Button
                     key={dmUser.id}
                     variant="ghost"
@@ -160,6 +163,10 @@ export function Sidebar({
                         ? "bg-purple-600 text-white hover:bg-purple-700"
                         : ""
                     }`}
+                    onClick={() => {
+                      setSelectedDM(dmUser.id as string)
+                      setSelectedChannel("adb51bba-bd23-469f-82ea-8286de19bc5e")
+                    }}
                   >
                     <div className="relative mr-2">
                       <Avatar className="h-6 w-6">
@@ -178,6 +185,7 @@ export function Sidebar({
                     </div>
                     <span className="text-sm truncate">{dmUser.credentials?.username}</span>
                   </Button>
+                  </>
                 );
               })}
             </div>

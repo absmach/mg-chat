@@ -36,6 +36,7 @@ export function MessageList({
         {messages.map((message, index) => {
           const previousMessage = messages[index - 1];
           const isMine = message.publisher === userId;
+          console.log("isMine", isMine);
           // const showAvatar =
           //   !previousMessage ||
           //   previousMessage.author.id !== message.author.id ||

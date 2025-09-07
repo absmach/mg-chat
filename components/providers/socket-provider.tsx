@@ -87,6 +87,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const sendMessage = (msg: object) => {
+    console.log("msg", msg);
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       const payload = JSON.stringify([msg]);
       wsRef.current.send(payload);
