@@ -5,14 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-import { Bell, Check, X, Users } from "lucide-react"
+import { Bell, Check, X, Users, BellOff } from "lucide-react"
 import { Invitation } from "@absmach/magistrala-sdk"
 import { AcceptInvitation, DeclineInvitation } from "@/lib/invitations"
 import { toast } from "sonner"
 
 
-export function NotificationsBell({ invitation }: { invitation: Invitation[] }) {
-    const [invitations, setInvitations] = useState<Invitation[]>(invitation)
+export function NotificationsBell({ invitations }: { invitations: Invitation[] }) {
     const [processing, setProcessing] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState(false)
 
@@ -55,7 +54,7 @@ export function NotificationsBell({ invitation }: { invitation: Invitation[] }) 
             <PopoverTrigger asChild>
                 <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0 hover:bg-gray-100">
                     <Bell className="h-5 w-5 text-gray-600" />
-                    {invitations.length > 0 && (
+                    {invitations?.length > 0 && (
                         <Badge
                             variant="destructive"
                             className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
@@ -71,7 +70,7 @@ export function NotificationsBell({ invitation }: { invitation: Invitation[] }) 
                     <div className="flex items-center gap-2">
                         <Bell className="h-5 w-5" />
                         <h3 className="font-semibold">Notifications</h3>
-                        {invitations.length > 0 && (
+                        {invitations?.length > 0 && (
                             <Badge variant="secondary" className="ml-auto">
                                 {invitations.length}
                             </Badge>
@@ -80,15 +79,9 @@ export function NotificationsBell({ invitation }: { invitation: Invitation[] }) 
                 </div>
 
                 <ScrollArea className="h-96">
-                    {invitations.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-                            <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-                            <p className="text-muted-foreground">No new notifications</p>
-                            <p className="text-sm text-muted-foreground mt-1">You are all caught up!</p>
-                        </div>
-                    ) : (
+                    {invitations?.length > 0 ? (
                         <div className="space-y-1">
-                            {invitations.map((invitation) => (
+                            {invitations?.map((invitation) => (
                                 <div
                                     key={invitation.role_id}
                                     className="border-b border-border last:border-b-0 p-4 hover:bg-muted/50 transition-colors"
@@ -142,6 +135,12 @@ export function NotificationsBell({ invitation }: { invitation: Invitation[] }) 
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                            <BellOff className="h-12 w-12 text-muted-foreground mb-3" />
+                            <p className="text-muted-foreground">No new notifications</p>
+                            <p className="text-sm text-muted-foreground mt-1">You are all caught up!</p>
                         </div>
                     )}
                 </ScrollArea>

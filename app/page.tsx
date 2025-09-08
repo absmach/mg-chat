@@ -1,13 +1,11 @@
 import { getServerSession } from "@/lib/nextauth";
 import { ListWorkspaces } from "@/lib/workspace";
-import { LogOut, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
 import { WorkspaceCard } from "@/components/workspace/workspace-card";
 import { NotificationsBell } from "@/components/invitations/view-invitations";
 import { GetUserInvitations } from "@/lib/invitations";
 import { Invitation } from "@absmach/magistrala-sdk";
-import { Button } from "@/components/ui/button";
-import { signOut } from "next-auth/react";
 import { Logout } from "@/components/chat/sidebar/logout";
 
 export default async function Home() {
@@ -42,7 +40,7 @@ export default async function Home() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <NotificationsBell invitation={invitationResponse?.data?.invitations as Invitation[]} />
+            <NotificationsBell invitations={invitationResponse?.data?.invitations as Invitation[]} />
             <Logout />
           </div>
         </div>

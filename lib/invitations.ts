@@ -92,7 +92,7 @@ export const AcceptInvitation = async (domainId: string) => {
       error: knownError.message || knownError.toString(),
     };
   } finally {
-    revalidatePath(`/`);
+    revalidatePath("/");
   }
 };
 
@@ -111,7 +111,7 @@ export const DeclineInvitation = async (domainId: string) => {
       error: knownError.error || knownError.message || knownError.toString(),
     };
   } finally {
-    revalidatePath(`/`);
+    revalidatePath("/");
   }
 };
 
