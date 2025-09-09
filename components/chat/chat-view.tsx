@@ -27,7 +27,7 @@ export function ChatView({
   session,
   domainId,
 }: Props) {
-  const { messages, setMessages, sendMessage, connect } = useWebSocket();
+  const { messages, setMessages, sendMessage, connect, disconnect } = useWebSocket();
   const { domain } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
@@ -70,7 +70,10 @@ export function ChatView({
     if (selectedChannel && domain?.id) {
       connectSocket();
     }
-  }, [domain, selectedChannel, connect]);
+    return () => {
+      disconnect();
+    };
+  }, [domain, selectedChannel, disconnect, connect]);
 
   useEffect(() => {
     const getData = async () => {

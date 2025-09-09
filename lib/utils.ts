@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import { NextRequest } from "next/server";
 import { twMerge } from "tailwind-merge";
 
@@ -52,4 +53,20 @@ export const generateUrl = (
   }
 
   return url;
+};
+
+export const createPageUrl = (
+  searchParams: ReadonlyURLSearchParams,
+  pathname: string,
+  value: string | number | undefined | null,
+  type: string,
+) => {
+  const params = new URLSearchParams(searchParams);
+  if (value === undefined || value === null) {
+    params.delete(type);
+  } else {
+    params.set(type, value.toString());
+  }
+
+  return `${pathname}?${params.toString()}`;
 };

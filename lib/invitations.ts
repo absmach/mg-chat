@@ -115,6 +115,31 @@ export const DeclineInvitation = async (domainId: string) => {
   }
 };
 
+export const DeleteInvitation = async ({
+  domainId,
+  userId
+}: {
+  domainId: string;
+  userId: string;
+}) => {
+  const { accessToken } = await validateOrGetToken("");
+  try {
+    await mgSdk.Domains.DeleteInvitation(userId, domainId, accessToken);
+    return {
+      data: "Inviatation Deleted Successfully",
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/");
+  }
+};
+
 export const GetUserInvitations = async (queryParams: InvitationPageMeta) => {
   try {
     const { accessToken } = await validateOrGetToken("");
@@ -193,3 +218,31 @@ async function processInvitations(
   return invitations;
 }
 
+export const GetDomainInvitations = async (queryParams: InvitationPageMeta) => {
+  const { domainId, accessToken } = await validateOrGetToken("");
+  try {
+    const invitationsPage = await mgSdk.Domains.ListDomainInvitations(
+      queryParams,
+      domainId,
+      accessToken,
+    );
+    const invitations = await processInvitations(
+      invitationsPage.invitations,
+      accessToken,
+    );
+    return {
+      data: {
+        total: invitationsPage.total,
+        offset: invitationsPage.offset,
+        limit: invitationsPage.limit,
+        invitations,
+      } as InvitationsPage,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    throw new Error(
+      knownError.error || knownError.message || knownError.toString(),
+    );
+  }
+};

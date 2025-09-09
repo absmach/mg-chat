@@ -25,7 +25,7 @@ export const CreateChannel = async (channel: Channel) => {
       error: knownError.error || knownError.message || knownError.toString(),
     };
   } finally {
-    revalidatePath(`/chat`);
+    revalidatePath("/chat");
   }
 };
 

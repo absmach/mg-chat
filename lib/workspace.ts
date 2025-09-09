@@ -1,6 +1,6 @@
 "use server";
 
-import type { Domain, DomainBasicInfo, DomainsPage, MemberRolesPage, PageMetadata, Role, RolePage, UserBasicInfo } from "@absmach/magistrala-sdk";
+import type { Domain, DomainBasicInfo, MemberRolesPage, Role, RolePage, UserBasicInfo } from "@absmach/magistrala-sdk";
 import { mgSdk, RequestOptions, validateOrGetToken } from "@/lib/magistrala";
 import type { HttpError } from "@/types/errors";
 import { revalidatePath } from "next/cache";
@@ -70,7 +70,7 @@ export const AddDomainRoleMembers = async (
       error: knownError.error || knownError.message || knownError.toString(),
     };
   } finally {
-    revalidatePath(`/chat`);
+    revalidatePath("/chat");
   }
 };
 

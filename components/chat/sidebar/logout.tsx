@@ -12,7 +12,7 @@ export const Logout = () => {
         <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer"
+            className="h-8 w-8 p-0 text-gray-400 hover:bg-muted/50 cursor-pointer"
             onClick={async () => {
                 const data = await signOut({
                     redirect: false,

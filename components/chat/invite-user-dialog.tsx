@@ -88,7 +88,6 @@ export function InviteMember({
         const domain = await GetDomainBasicInfo(domainId);
         const domainName =
             typeof domain === "object" && "name" in domain ? domain.name : domainId;
-        console.log("errors", response.errors);
         const hasErrors = response.errors.some((e) => e !== null);
         if (hasErrors) {
             toast.error(

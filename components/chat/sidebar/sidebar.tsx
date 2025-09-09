@@ -5,16 +5,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Hash, Plus, Settings } from "lucide-react";
+import { Hash } from "lucide-react";
 import { Session } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
-import { Channel, Client, User } from "@absmach/magistrala-sdk";
-import { set } from "date-fns";
+import { Channel } from "@absmach/magistrala-sdk";
 import { Member, Metadata } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
+import { Settings } from "./settings";
 
 interface Props {
   session: Session;
@@ -81,10 +80,10 @@ export function Sidebar({
   const domain = session.domain;
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b flex flex-row border-gray-700">
         <Button
           variant="ghost"
-          className="cursor-pointer w-full justify-start p-2 h-auto text-white hover:bg-gray-700 items-center space-x-2"
+          className="cursor-pointer w-9/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center space-x-2"
           onClick={handleSwitchWorkspace}
         >
           <Avatar>
@@ -98,9 +97,10 @@ export function Sidebar({
               {domain?.name || "Loading..."}
             </p>
             <p className="text-xs text-gray-300 truncate">{domain?.route}</p>
-          </div>
-          <Settings className="h-4 w-4 text-gray-400" />
+          </div> 
         </Button>
+        <Settings />
+
       </div>
 
       <ScrollArea className="flex-1">
