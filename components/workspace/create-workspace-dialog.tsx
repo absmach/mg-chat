@@ -32,7 +32,7 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
    const toastId = toast("Sonner");
     e.preventDefault();
     if (!name.trim() && !route.trim()) return;
-
+    toast.loading("Creating workspace ...", { id: toastId });
     setIsLoading(true);
 
     const newWorkspace: Domain = {

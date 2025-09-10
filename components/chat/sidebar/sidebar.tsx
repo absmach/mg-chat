@@ -10,7 +10,7 @@ import { Session } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
-import { Channel } from "@absmach/magistrala-sdk";
+import { Channel, InvitationsPage } from "@absmach/magistrala-sdk";
 import { Member, Metadata } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
@@ -23,6 +23,8 @@ interface Props {
   setSelectedDM: (userId: string | null) => void;
   metadata: Metadata;
   members: Member[];
+  invitationsPage: InvitationsPage;
+  status: string;
 }
 
 export function Sidebar({
@@ -33,6 +35,8 @@ export function Sidebar({
   setSelectedDM,
   metadata,
   members,
+  invitationsPage,
+  status,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
@@ -99,7 +103,7 @@ export function Sidebar({
             <p className="text-xs text-gray-300 truncate">{domain?.route}</p>
           </div> 
         </Button>
-        <Settings />
+        <Settings domainId={domain?.id as string} status={status} invitationsPage={invitationsPage} />
 
       </div>
 

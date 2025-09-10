@@ -1,33 +1,57 @@
 "use client";
 
+import { InvitationsDialog } from "@/components/invitations/invitation-dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { InvitationsPage } from "@absmach/magistrala-sdk";
 import { SettingsIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export function Settings() {
-  const router = useRouter();
+export function Settings({
+domainId,
+status,
+invitationsPage,
+}:{
+domainId: string;
+status: string;
+invitationsPage: InvitationsPage
+}) {
+  const [showInvitationDialog, setShowInvitationDialog] = useState(false);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild={true}>
-        <Button variant="ghost" className="mt-2 text-gray-400 p-2 hover:bg-muted/50">
-          <SettingsIcon className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-(--radix-dropdown-menu-trigger-width) min-w-48 rounded-lg ml-2"
-        side="bottom"
-        align="end"
-        sideOffset={4}
-      >
-        <DropdownMenuGroup>
-          <DropdownMenuItem onSelect={() => router.push("/invitations")}>
-            <span>Manage Invitations</span>
-            <DropdownMenuShortcut>⇧⌘I</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild={true}>
+          <Button variant="ghost" className="mt-2 text-gray-400 p-2 hover:bg-muted/50">
+            <SettingsIcon className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="w-(--radix-dropdown-menu-trigger-width) mt-12 min-w-48 rounded-lg ml-2"
+          side="right"
+          align="end"
+          sideOffset={4}
+        >
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setShowInvitationDialog(true);
+              }}
+            >
+              <span>Manage Invitations</span>
+              <DropdownMenuShortcut>⇧⌘I</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <InvitationsDialog
+        showInvitationDialog={showInvitationDialog}
+        setShowInvitationDialog={setShowInvitationDialog}
+        invitationsPage={invitationsPage}
+        status={status}
+        domainId={domainId}
+      />
+    </>
   );
 }

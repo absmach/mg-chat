@@ -33,7 +33,7 @@ export function CreateChannelDialog({ setRevalidate }: Props) {
     const toastId = toast("Sonner");
     e.preventDefault();
     if (!name.trim()) return;
-
+    toast.loading("Creating channel ...", { id: toastId });
     setIsLoading(true);
 
     const channel: Channel = {
