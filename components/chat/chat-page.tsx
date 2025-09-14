@@ -36,7 +36,6 @@ export default function ChatPage({ session, metadata, members, invitationsPage, 
           metadata={metadata}
           members={members}
           invitationsPage={invitationsPage}
-          status={status}
         />
       </div>
 
