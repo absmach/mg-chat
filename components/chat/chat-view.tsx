@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, Hash, MessageCircle } from "lucide-react";
+import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
 import { Channel, ChannelsPage, Client } from "@absmach/magistrala-sdk";
@@ -175,6 +175,7 @@ export function ChatView({
             )}
           </div>
         </div>
+        <EllipsisVertical className="h-4 w-4" />
       </div>
 
       <div className="flex-1 flex flex-col">

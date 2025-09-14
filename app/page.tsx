@@ -30,7 +30,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="bg-white border-b border-gray-100 px-6 py-4 mb-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="flex justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {session.user.username}!

@@ -24,7 +24,6 @@ interface Props {
   metadata: Metadata;
   members: Member[];
   invitationsPage: InvitationsPage;
-  status: string;
 }
 
 export function Sidebar({
@@ -36,7 +35,6 @@ export function Sidebar({
   metadata,
   members,
   invitationsPage,
-  status,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
@@ -103,7 +101,7 @@ export function Sidebar({
             <p className="text-xs text-gray-300 truncate">{domain?.route}</p>
           </div> 
         </Button>
-        <Settings domainId={domain?.id as string} status={status} invitationsPage={invitationsPage} />
+        <Settings domainId={domain?.id as string} invitationsPage={invitationsPage} />
 
       </div>
 

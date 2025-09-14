@@ -1,6 +1,6 @@
 "use client";
 
-import { InvitationsDialog } from "@/components/invitations/invitation-dialog";
+import  { InvitationsDialog }  from "@/components/invitations/invitation-dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { InvitationsPage } from "@absmach/magistrala-sdk";
@@ -9,11 +9,9 @@ import { useState } from "react";
 
 export function Settings({
 domainId,
-status,
 invitationsPage,
 }:{
 domainId: string;
-status: string;
 invitationsPage: InvitationsPage
 }) {
   const [showInvitationDialog, setShowInvitationDialog] = useState(false);
@@ -34,8 +32,7 @@ invitationsPage: InvitationsPage
         >
           <DropdownMenuGroup>
             <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
+              onSelect={() => {
                 setShowInvitationDialog(true);
               }}
             >
@@ -48,8 +45,7 @@ invitationsPage: InvitationsPage
       <InvitationsDialog
         showInvitationDialog={showInvitationDialog}
         setShowInvitationDialog={setShowInvitationDialog}
-        invitationsPage={invitationsPage}
-        status={status}
+        invitations={invitationsPage.invitations}
         domainId={domainId}
       />
     </>
