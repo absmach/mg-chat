@@ -22,11 +22,11 @@ export const CreateUser = async (user: User) => {
 };
 
 export const UpdateUser = async (user: User) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { accessToken } = await validateOrGetToken("");
   try {
     const updated = await mgSdk.Users.Update(user, accessToken);
     return {
-      data: updated.credentials?.username as string,
+      data: updated,
       error: null,
     };
   } catch (err: unknown) {

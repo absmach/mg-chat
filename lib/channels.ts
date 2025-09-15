@@ -5,7 +5,6 @@ import type { Channel } from "@absmach/magistrala-sdk";
 import { revalidatePath } from "next/cache";
 import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
-import { ProcessEntityMembers } from "./actions";
 
 export const CreateChannel = async (channel: Channel) => {
   const { accessToken, domainId } = await validateOrGetToken("");
@@ -26,7 +25,7 @@ export const CreateChannel = async (channel: Channel) => {
       error: knownError.error || knownError.message || knownError.toString(),
     };
   } finally {
-    revalidatePath(`/chat`);
+    revalidatePath("/chat");
   }
 };
 
@@ -73,22 +72,21 @@ export const ViewChannel = async (id: string, listRoles?: boolean) => {
   }
 };
 
-export const ListChannelMembers = async ({
-  token = "",
-  id = "",
-  queryParams,
-}: RequestOptions) => {
+
+export const ListChannelMembers = async (
+  { token = "", id = "", queryParams }: RequestOptions,
+  domainId: string
+) => {
   try {
-    const { accessToken, domainId } = await validateOrGetToken(token);
+    const { accessToken } = await validateOrGetToken(token);
     const members = await mgSdk.Channels.ListChannelMembers(
       id,
       domainId,
       queryParams,
       accessToken
     );
-    const processedMembers = await ProcessEntityMembers(members, queryParams);
     return {
-      data: processedMembers,
+      data: members,
       error: null,
     };
   } catch (err: unknown) {

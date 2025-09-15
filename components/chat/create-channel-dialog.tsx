@@ -20,36 +20,32 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateRule } from "@/lib/rules";
 import { Metadata, OutputType } from "@/types/entities";
-import { ConnectClients } from "@/lib/clients";
 interface Props {
   setRevalidate: (value: boolean) => void;
   metadata: Metadata;
 }
-export function CreateChannelDialog({ setRevalidate, metadata }: Props) {
+export function CreateChannelDialog({ setRevalidate }: Props) {
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    const toastId = toast("Sonner");
     e.preventDefault();
     if (!name.trim()) return;
-
+    toast.loading("Creating channel ...", { id: toastId });
     setIsLoading(true);
 
     const channel: Channel = {
       name,
-      tags: ["group"],
+      tags: ["chat"],
     };
 
     const response = await CreateChannel(channel);
 
     if (response.error !== null) {
-      toast.error(`Failed to create channel with error: ${response.error}`);
+      toast.error(`Failed to create channel with error: ${response.error}`, { id: toastId });
     } else {
-      const connectResp = await ConnectClients([metadata?.ui?.client?.id as string], response.data.id as string, ["publish", "subscribe"]);
-      if(connectResp.error !== null){
-        toast.error(`Failed to connect channel ${response.data.name} to client`)
-      } else {
       const rule: Rule = {
         input_channel: response.data.id,
         input_topic: "",
@@ -69,13 +65,13 @@ export function CreateChannelDialog({ setRevalidate, metadata }: Props) {
       };
       const ruleResponse = await CreateRule(rule);
       if (ruleResponse.error !== null) {
-        toast.error(`Failed to create rule with error: ${ruleResponse.error}`);
+        toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
       } else {
         setRevalidate(true);
-        toast.success("Channel created successfully");
+        toast.success("Channel created successfully", { id: toastId });
         setName("");
         setOpen(false);
-      }}
+      }
     }
     setIsLoading(false);
   };

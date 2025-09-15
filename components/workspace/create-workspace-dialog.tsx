@@ -14,13 +14,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Client, Domain, User } from "@absmach/magistrala-sdk";
+import { Domain } from "@absmach/magistrala-sdk";
 import { CreateWorkspace } from "@/lib/workspace";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
-import { CreateClient } from "@/lib/clients";
-import { UpdateUser, UserProfile } from "@/lib/users";
-import { Metadata } from "@/types/entities";
 
 interface Props {
   isMobile: boolean;
@@ -32,9 +29,10 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
+   const toastId = toast("Sonner");
     e.preventDefault();
     if (!name.trim() && !route.trim()) return;
-
+    toast.loading("Creating workspace ...", { id: toastId });
     setIsLoading(true);
 
     const newWorkspace: Domain = {
@@ -44,49 +42,13 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
 
     const result = await CreateWorkspace(newWorkspace);
     if (result.error === null) {
-      const userResponse = await UserProfile();
-      if (userResponse.error !== null) {
-        toast.error(`Failed to fetch user with error: ${userResponse.error}`);
-      } else {
-        const user = userResponse.data;
-        const client: Client = {
-          name: user.credentials?.username,
-        };
-        const response = await CreateClient(client, result.data.id as string);
-        if (response.error !== null) {
-          toast.error(`Failed to create client with error: ${response.error}`);
-        } else {
-          const updatedMetadata: Metadata = {
-            ...user?.metadata,
-            ui: {
-              ...user?.metadata?.ui,
-              client: {
-                id: response?.data.id,
-                secret: response?.data.credentials?.secret,
-              },
-            },
-          };
-          const updatedUser: User = {
-            ...user,
-            metadata: updatedMetadata,
-          };
-          const updatedUserResponse = await UpdateUser(updatedUser);
-          if (updatedUserResponse.error !== null) {
-            toast.error(
-              `Failed to update user with error: ${updatedUserResponse.error}`
-            );
-          } else {
-            setOpen(false);
-            setName("");
-            setRoute("");
-            toast.success("Workspace created successfully");
-          }
-        }
-      }
+      toast.success("Workspace created successfully", { id: toastId });
     } else {
-      toast.error(`Failed to create workspace with error: ${result.error}`);
-      console.error(result.error);
+      toast.error(`Failed to create workspace with error: ${result.error}`, { id: toastId });
     }
+    setOpen(false);
+    setName("");
+    setRoute("");
     setIsLoading(false);
   };
   return (

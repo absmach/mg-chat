@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
-import { Smile, Download, FileText, ImageIcon } from "lucide-react";
-import { EmojiPicker } from "./emoji-picker";
-import { SenMLMessage } from "@absmach/magistrala-sdk";
+import { Smile, FileText, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MessageItemProps {

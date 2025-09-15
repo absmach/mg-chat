@@ -93,7 +93,7 @@ export async function DomainLogin(workspaceId: string) {
     secure: secure,
   });
 
-  redirect(`/chat`);
+  redirect("/chat");
 }
 
 export async function ProcessEntityMembers(

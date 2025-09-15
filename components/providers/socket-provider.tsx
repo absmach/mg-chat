@@ -1,6 +1,7 @@
 "use client";
 
 import { SenMLMessage } from "@absmach/magistrala-sdk";
+import { useSession } from "next-auth/react";
 import {
   createContext,
   Dispatch,
@@ -16,7 +17,7 @@ type WebSocketContextType = {
   messages: SenMLMessage[];
   setMessages: Dispatch<SetStateAction<SenMLMessage[]>>;
   sendMessage: (msg: object) => void;
-  connect: (domainId: string, channelId: string, clientSecret: string) => void;
+  connect: (domainId: string, channelId: string) => void;
   disconnect: () => void;
 };
 
@@ -25,15 +26,13 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 );
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-  const [messages, setMessages] = useState<SenMLMessage[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
+  const user = useSession();
+  const token = user?.data?.accessToken;
 
-  const connect = (
-    domainId: string,
-    channelId: string,
-    clientSecret: string
-  ) => {
-    const wsUrl = `ws://localhost:8186/m/${domainId}/c/${channelId}?authorization=${clientSecret}`;
+  const connect = (domainId: string, channelId: string) => {
+    const wsUrl = `ws://localhost:8186/m/${domainId}/c/${channelId}?authorization=Bearer%20${token}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
@@ -53,16 +52,22 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
       }
 
       try {
-        const parsed: SenMLMessage[] = JSON.parse(raw);
-        console.log("Received:", parsed);
+        const parsed: any[] = JSON.parse(raw);
 
-        setMessages((prev) => [...prev, ...parsed]);
-        // spread because server may send an array
+        setMessages((prev) => {
+          const existingKeys = new Set(prev.map((m) => `${m.n}-${m.t}`));
+
+          const uniqueParsed = parsed.filter(
+            (m) => !existingKeys.has(`${m.n}-${m.t}`)
+          );
+
+          // spread because server may send an array
+          return [...prev, ...uniqueParsed];
+        });
       } catch (err) {
         console.error("Failed to parse message:", raw, err);
       }
     };
-
     ws.onerror = (err) => {
       console.error("WebSocket error:", err);
     };
@@ -92,7 +97,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     return () => {
-      disconnect(); 
+      disconnect();
     };
   }, []);
 
