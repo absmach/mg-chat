@@ -39,7 +39,11 @@ export function ChatView({
       const getMessages = async () => {
         const response = await GetMessages({
           id: channelInfo?.id as string,
-          queryParams: { offset: 0, limit: 100 },
+          queryParams: { 
+            offset: 0, 
+            limit: 100,
+            order: "time",
+            dir: "asc" },
         });
 
         if (response.data) {
@@ -49,7 +53,7 @@ export function ChatView({
 
       getMessages();
     }
-  }, [channelInfo?.id]);
+  }, [channelInfo?.id, setMessages]);
 
   useEffect(() => {
     const connectSocket = async () => {
