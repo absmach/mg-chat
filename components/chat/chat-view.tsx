@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
-import { Channel, ChannelsPage, Client, SenMLMessage } from "@absmach/magistrala-sdk";
-import { ListChannelMembers, ViewChannel } from "@/lib/channels";
+import { Channel, ChannelsPage, Client, SenMLMessage, User } from "@absmach/magistrala-sdk";
+import { ListChannelMembers, ListChannels, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
-import { UserProfile } from "@/lib/users";
+import { UserProfile, ViewUser } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
 import { DM_Mono } from "next/font/google";
 
@@ -19,6 +19,7 @@ interface Props {
   setSelectedChannel: (channel: string | null) => void;
   session: Session;
   domainId: string;
+  dmChannelId: string;
 }
 
 export function ChatView({
@@ -27,6 +28,7 @@ export function ChatView({
   selectedDM,
   session,
   domainId,
+  dmChannelId,
 }: Props) {
   const { messages, setMessages, sendMessage, connect, disconnect } = useWebSocket();
   const { domain } = session;
@@ -35,13 +37,11 @@ export function ChatView({
   const [members, setMembers] = useState<Client[]>([]);
   const [userId, setUserId] = useState(session?.user?.id);
   const [chanMessages, setChanMessages] = useState(messages);
-  const [filteredMessages, setFilteredMessages] = useState<SenMLMessage[]>([])
+  const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
 
-  console.log("selectedDM", selectedDM);
-  console.log("userId", userId);
   useEffect(() => {
-    if (channelInfo?.id) {
-      const getMessages = async () => {
+    const fetchMessages = async () => {
+      if (channelInfo?.id && !selectedDM) {
         const response = await GetMessages({
           id: channelInfo?.id as string,
           queryParams: { 
@@ -53,33 +53,55 @@ export function ChatView({
 
         if (response.data) {
           setMessages(response.data.messages);
+          setChanMessages(response.data.messages);
         }
-      };
+        return;
+      }
 
-      getMessages();
-    }
-  }, [channelInfo?.id, setMessages]);
+      if (selectedDM && dmChannelId && userId) {
+        const getDMTopic = (userId1: string, userId2: string): string => {
+          const sortedIds = [userId1, userId2].sort();
+          return `${sortedIds[0]}-${sortedIds[1]}`;
+        };
+
+        const dmTopic = getDMTopic(userId, selectedDM);
+        const response = await GetMessages({
+          id: dmChannelId,
+          queryParams: {
+            offset: 0,
+            limit: 100,
+            name: dmTopic
+          },
+        });
+
+        if (response.data) {
+          setMessages(response.data.messages);
+          setChanMessages(response.data.messages);
+        }
+      }
+    };
+
+    fetchMessages();
+  }, [channelInfo?.id, selectedDM, dmChannelId, userId, setMessages, setChanMessages]);
+
+  const getDMTopic = (userId1: string, userId2: string): string => {
+    const sortedIds = [userId1, userId2].sort();
+    return `${sortedIds[0]}-${sortedIds[1]}`;
+  };
+
 
   useEffect(() => {
     const connectSocket = async () => {
       const userProfile = await UserProfile();
-      // if (userProfile.data !== null) {
-      //   setUserId(userProfile.data.id as string);
-      if (selectedChannel) {
+      if (userProfile.data !== null) {
+        setUserId(userProfile.data.id as string);
         connect(
           domain?.id as string,
           selectedChannel as string,
         );
-      } else {
-        console.log("[DM SYSTEM] Connecting to universal direct-messages channel for DM with user:", selectedDM)
-        connect(
-          domain?.id as string,
-          "adb51bba-bd23-469f-82ea-8286de19bc5e"
-        )
       }
-      // }
     };
-    if ((selectedChannel || selectedDM) && domain?.id) {
+    if (selectedChannel && domain?.id) {
       connectSocket();
     }
     return () => {
@@ -100,40 +122,36 @@ export function ChatView({
           setChannelInfo(response.data);
         }
       } else {
-        setChannelInfo(null);
+        setSelectedChannel(selectedChannel);
       }
     };
 
     getData();
   }, [selectedChannel, setSelectedChannel]);
 
-  // const handleSend = (input: string) => {
-  //   if (input.trim()) {
-  //     sendMessage({
-  //       n: "chat",
-  //       vs: input,
-  //       t: Date.now() * 1e6,
-  //       publisher: userId,
-  //     });
-  //   }
-  // };
+  useEffect(() => {
+    const getData = async () => {
+      const response = await ViewUser(selectedDM || "");
+      if (response.data) {
+        setDmUserInfo(response.data);
+      }
+    };
+
+    getData();
+  }, [selectedDM]);
+
   const handleSend = (input: string) => {
     if (input.trim()) {
       if (selectedDM && userId) {
-        const dmTopic = `${userId}-${selectedDM}`
-        console.log("dmTopic in send-messages", dmTopic);
-        console.log("[DM SYSTEM] Sending DM with topic:", dmTopic)
+        const dmTopic = getDMTopic(userId, selectedDM);
 
-        // Send message through universal direct-messages channel with specific topic
-        // The topic "n" field allows filtering on the receiving end
         sendMessage({
-          n: dmTopic, // Topic: sorted user IDs (e.g., "1-2")
-          vs: input, // Message content
-          t: Date.now() * 1e6, // Timestamp
-          publisher: userId, // Sender ID
+          n: dmTopic, 
+          vs: input, 
+          t: Date.now() * 1e6, 
+          publisher: userId, 
         })
       } else {
-        // Regular channel message (no topic filtering needed)
         sendMessage({
           n: "chat",
           vs: input,
@@ -143,55 +161,6 @@ export function ChatView({
       }
     }
   }
-
-  // useEffect(() => {
-  //   if (selectedDM && userId) {
-  //     // Generate the topic for this specific DM conversation
-  //     const dmTopic = "ava-jane"
-  //     console.log("[DM SYSTEM] Filtering messages for topic:", dmTopic)
-
-  //     // Only show messages where topic matches this DM conversation
-  //     // Example: If Jane (1) and Ava (2) are chatting, only show messages with topic "1-2"
-  //     const filtered = messages.filter((msg) => msg.name === dmTopic)
-  //     setFilteredMessages(filtered)
-  //   } else {
-  //     // For regular channels, show all messages (no filtering needed)
-  //     setFilteredMessages(messages)
-  //   }
-  // }, [messages, selectedDM, userId])
-
-  useEffect(() => {
-    const getMessage = async () => {
-      const userProfile = await UserProfile();
-      if (userProfile.data !== null) {
-        setUserId(userProfile.data.id as string);
-        if (selectedDM) {
-          const dmTopic = `${userId}-${selectedDM}`
-          console.log("dmTopic in getmessages", dmTopic);
-          const response = await GetMessages({
-            id: channelInfo?.id as string,
-            queryParams:
-              { offset: 0, limit: 100, protocol: "websocket", name: dmTopic }
-          });
-          console.log("messages", response.data?.messages);
-          if (response.data) {
-            setChanMessages(response.data.messages);
-          }
-        } else {
-          const response = await GetMessages({
-            id: channelInfo?.id as string,
-            queryParams:
-              { offset: 0, limit: 100, protocol: "websocket" }
-          });
-          console.log("messages", response.data?.messages);
-          if (response.data) {
-            setChanMessages(response.data.messages);
-          }
-        }
-      }
-    };
-    getMessage();
-  }, [channelInfo?.id, userId, selectedDM]);
 
   useEffect(() => {
     const getMembers = async () => {
@@ -236,24 +205,11 @@ export function ChatView({
             <Menu className="h-5 w-5" />
           </Button>
 
-          {/* {channelInfo?.tags?.includes("chat") ? (
-            <Hash className="h-5 w-5 text-gray-500" />
-          ) : (
-            <MessageCircle className="h-5 w-5 text-gray-500" />
-          )}
-
-          <div>
-            <h2 className="font-semibold text-gray-900">{channelInfo?.name}</h2>
-            {channelInfo?.tags?.includes("chat") && (
-              <p className="text-xs text-gray-500">{members?.length} {members?.length === 1 ? "member": "members"}</p>
-            )}
-          </div> */}
-          {selectedDM ? (
+          {selectedDM && selectedChannel ? (
             <>
               <MessageCircle className="h-5 w-5 text-gray-500" />
               <div>
-                <h2 className="font-semibold text-gray-900">{"Direct Message"}</h2>
-                <p className="text-xs text-gray-500">Direct message</p>
+                <h2 className="font-semibold text-gray-900">{dmUserInfo?.credentials?.username}</h2>
               </div>
             </>
           ) : (
@@ -279,8 +235,7 @@ export function ChatView({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
         ) : (
-          // <MessageList messages={messages} userId={userId as string} />
-          <MessageList messages={chanMessages} userId={userId as string} />
+            <MessageList messages={messages} userId={userId as string} />
         )}
 
         <div className="border p-6 m-4 rounded-md">

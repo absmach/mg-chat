@@ -19,12 +19,12 @@ import { CreateChannel } from "@/lib/channels";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateRule } from "@/lib/rules";
-import { Metadata, OutputType } from "@/types/entities";
+import { OutputType } from "@/types/entities";
 interface Props {
   setRevalidate: (value: boolean) => void;
-  metadata: Metadata;
+  domainId: string;
 }
-export function CreateChannelDialog({ setRevalidate }: Props) {
+export function CreateChannelDialog({ setRevalidate, domainId }: Props) {
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ export function CreateChannelDialog({ setRevalidate }: Props) {
       tags: ["chat"],
     };
 
-    const response = await CreateChannel(channel);
+    const response = await CreateChannel(channel, domainId);
 
     if (response.error !== null) {
       toast.error(`Failed to create channel with error: ${response.error}`, { id: toastId });

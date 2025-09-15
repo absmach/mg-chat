@@ -24,6 +24,7 @@ interface Props {
   metadata: Metadata;
   members: Member[];
   invitationsPage: InvitationsPage;
+  dmChannelId: string
 }
 
 export function Sidebar({
@@ -35,10 +36,11 @@ export function Sidebar({
   metadata,
   members,
   invitationsPage,
+  dmChannelId,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
-  const [directMessages, setDirectMessages] = useState<Channel[]>([]);
+  const [directMessages, setDirectMessages] = useState<string | null>(null);
 
   const workspaceId = session.domain?.id;
 
@@ -53,12 +55,12 @@ export function Sidebar({
     }
 
     const directResponse = await ListChannels({
-      queryParams: { offset: 0, limit: 100, tag: "direct" },
+      queryParams: { offset: 0, limit: 1, tag: "dm" },
     });
     if (directResponse.data) {
-      setDirectMessages(directResponse.data.channels);
+      setDirectMessages(directResponse.data.channels?.[0]?.id as string);
     } else {
-      setDirectMessages([]);
+      setDirectMessages(null);
     }
   }, []);
 
@@ -80,8 +82,7 @@ export function Sidebar({
   };
 
   const domain = session.domain;
-  console.log("selectedDM", selectedDM);
-  console.log("logged in user", session?.user?.id)
+
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
       <div className="p-4 border-b flex items-center justify-between border-gray-700">
@@ -114,7 +115,7 @@ export function Sidebar({
               <span className="text-sm font-medium text-gray-300">
                 Channels
               </span>
-              <CreateChannelDialog setRevalidate={setRevalidate} metadata={metadata}/>
+              <CreateChannelDialog setRevalidate={setRevalidate} domainId={domain?.id as string}/>
             </div>
 
             <div className="space-y-1">
@@ -165,7 +166,7 @@ export function Sidebar({
                     }`}
                     onClick={() => {
                       setSelectedDM(dmUser.id as string)
-                      setSelectedChannel("adb51bba-bd23-469f-82ea-8286de19bc5e")
+                      setSelectedChannel(dmChannelId)
                     }}
                   >
                     <div className="relative mr-2">

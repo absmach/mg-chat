@@ -12,13 +12,12 @@ interface Props {
   metadata: Metadata;
   members: Member[];
   invitationsPage: InvitationsPage;
-  status: string
+  dmChannelId: string;
 }
-export default function ChatPage({ session, metadata, members, invitationsPage, status }: Props) {
+export default function ChatPage({ session, metadata, members, invitationsPage, dmChannelId }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(session?.user?.id as string);
   const domainId = session.domain?.id;
-  console.log("selectedDM", selectedDM);
   return (
     <>
       <div
@@ -36,6 +35,7 @@ export default function ChatPage({ session, metadata, members, invitationsPage, 
           metadata={metadata}
           members={members}
           invitationsPage={invitationsPage}
+          dmChannelId={dmChannelId as string} 
         />
       </div>
 
@@ -46,6 +46,7 @@ export default function ChatPage({ session, metadata, members, invitationsPage, 
           selectedDM={selectedDM}
           session={session}
           domainId={domainId as string}
+          dmChannelId={dmChannelId as string} 
         />
       </div>
     </>

@@ -24,7 +24,7 @@ export default async function Page({searchParams}: Props) {
     return <div>{workspaces.error}</div>;
   }
   const domainId = session?.domain?.id as string;
-  const memResponse = await ListDomainUsers(domainId, 
+  const memResponse = await ListDomainUsers(domainId,
     {
       offset: 0,
       limit: 100,
@@ -37,6 +37,10 @@ export default async function Page({searchParams}: Props) {
           limit: 100,
           state: status,
       });
+  const dmChannelResponse = await ListChannels({
+    queryParams: { offset: 0, limit: 1, tag: "dm" },
+  });
+  const dmChannelId = dmChannelResponse?.data?.channels?.[0]?.id;
 
   return (
     <div className="h-screen flex bg-gray-100">
@@ -49,8 +53,7 @@ export default async function Page({searchParams}: Props) {
       metadata={userResponse.data?.metadata as Metadata} 
       members={memResponse.data?.members as Member[]}
       invitationsPage={inviResponse?.data as InvitationsPage}
-      status={status}
-      />
+       dmChannelId={dmChannelId as string}/>
     </div>
   );
 }
