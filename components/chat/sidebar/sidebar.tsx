@@ -82,10 +82,10 @@ export function Sidebar({
   const domain = session.domain;
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
-      <div className="p-4 border-b flex flex-row border-gray-700">
+      <div className="p-4 border-b flex items-center justify-between border-gray-700">
         <Button
           variant="ghost"
-          className="cursor-pointer w-9/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center space-x-2"
+          className="cursor-pointer w-8/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center"
           onClick={handleSwitchWorkspace}
         >
           <Avatar>
