@@ -6,6 +6,7 @@ import { ViewUser } from "@/lib/users";
 import { Member, Metadata } from "@/types/entities";
 import { GetDomainInvitations } from "@/lib/invitations";
 import { InvitationsPage } from "@absmach/magistrala-sdk";
+import { ListChannels } from "@/lib/channels";
 
 export type Props = {
   searchParams?: Promise<{
@@ -13,7 +14,7 @@ export type Props = {
   }>;
 };
 
-export default async function Page({searchParams}: Props) {
+export default async function Page({ searchParams }: Props) {
   const session = await getServerSession();
   const workspaces = await ListWorkspaces({
     queryParams: { limit: 100, offset: 0 },
@@ -33,10 +34,10 @@ export default async function Page({searchParams}: Props) {
   const searchParamsValue = await searchParams;
   const status = searchParamsValue?.status || "pending";
   const inviResponse = await GetDomainInvitations({
-          offset: 0,
-          limit: 100,
-          state: status,
-      });
+    offset: 0,
+    limit: 100,
+    state: status,
+  });
   const dmChannelResponse = await ListChannels({
     queryParams: { offset: 0, limit: 1, tag: "dm" },
   });
@@ -48,12 +49,12 @@ export default async function Page({searchParams}: Props) {
         selectedWorkspaceId={session?.domain?.id as string}
         workspaces={workspaces.data}
       />
-      <ChatPage 
-      session={session} 
-      metadata={userResponse.data?.metadata as Metadata} 
-      members={memResponse.data?.members as Member[]}
-      invitationsPage={inviResponse?.data as InvitationsPage}
-       dmChannelId={dmChannelId as string}/>
+      <ChatPage
+        session={session}
+        metadata={userResponse.data?.metadata as Metadata}
+        members={memResponse.data?.members as Member[]}
+        invitationsPage={inviResponse?.data as InvitationsPage}
+        dmChannelId={dmChannelId as string} />
     </div>
   );
 }

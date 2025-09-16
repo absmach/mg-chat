@@ -63,16 +63,17 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
             type: 0,
             value:
               "\n" +
-              " function logicFunction()\n" +
+              "        function logicFunction()\n" +
               "   return message.payload\n" +
               " end\n" +
               "\n" +
-              " return logicFunction()\n",
+              "return logicFunction()\n" +
+              "      ",
           },
           name: `${createChanresp.data.name}save_messages`,
         };
 
-        const ruleResponse = await CreateRule(rule);
+        const ruleResponse = await CreateRule({rule, domain: result?.data?.id});
         if (ruleResponse.error !== null) {
           toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
         } else {

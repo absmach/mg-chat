@@ -63,7 +63,7 @@ export function CreateChannelDialog({ setRevalidate, domainId }: Props) {
         },
         name: `${response.data.name}save_messages`,
       };
-      const ruleResponse = await CreateRule(rule);
+      const ruleResponse = await CreateRule({rule});
       if (ruleResponse.error !== null) {
         toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
       } else {

@@ -19,6 +19,7 @@ type WebSocketContextType = {
   sendMessage: (msg: object) => void;
   connect: (domainId: string, channelId: string) => void;
   disconnect: () => void;
+  setActiveTopic: (topic: string | null) => void;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -27,6 +28,7 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<any[]>([]);
+  const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const user = useSession();
   const token = user?.data?.accessToken;
@@ -53,15 +55,14 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
       try {
         const parsed: any[] = JSON.parse(raw);
-
+        const filtered = activeTopic
+          ? parsed.filter((m) => m.n === activeTopic)
+          : parsed;
         setMessages((prev) => {
           const existingKeys = new Set(prev.map((m) => `${m.n}-${m.t}`));
-
-          const uniqueParsed = parsed.filter(
+          const uniqueParsed = filtered.filter(
             (m) => !existingKeys.has(`${m.n}-${m.t}`)
           );
-
-          // spread because server may send an array
           return [...prev, ...uniqueParsed];
         });
       } catch (err) {
@@ -104,7 +105,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <WebSocketContext.Provider
-      value={{ messages, setMessages, sendMessage, connect, disconnect }}
+      value={{ messages, setMessages, sendMessage, connect, disconnect, setActiveTopic }}
     >
       {children}
     </WebSocketContext.Provider>

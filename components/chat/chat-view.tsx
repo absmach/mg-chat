@@ -30,12 +30,18 @@ export function ChatView({
   domainId,
   dmChannelId,
 }: Props) {
-  const { messages, setMessages, sendMessage, connect, disconnect } = useWebSocket();
+  const [userId, setUserId] = useState(session?.user?.id);
+  const getDMTopic = (userId1: string, userId2: string): string => {
+    const sortedIds = [userId1, userId2].sort();
+    return `${sortedIds[0]}-${sortedIds[1]}`;
+  };
+
+  const dmTopic = getDMTopic(userId as string, selectedDM as string);
+  const { messages, setMessages, sendMessage, connect, disconnect, setActiveTopic } = useWebSocket();
   const { domain } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Client[]>([]);
-  const [userId, setUserId] = useState(session?.user?.id);
   const [chanMessages, setChanMessages] = useState(messages);
   const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
 
@@ -44,11 +50,12 @@ export function ChatView({
       if (channelInfo?.id && !selectedDM) {
         const response = await GetMessages({
           id: channelInfo?.id as string,
-          queryParams: { 
-            offset: 0, 
+          queryParams: {
+            offset: 0,
             limit: 100,
             order: "time",
-            dir: "asc" },
+            dir: "asc"
+          },
         });
 
         if (response.data) {
@@ -59,18 +66,14 @@ export function ChatView({
       }
 
       if (selectedDM && dmChannelId && userId) {
-        const getDMTopic = (userId1: string, userId2: string): string => {
-          const sortedIds = [userId1, userId2].sort();
-          return `${sortedIds[0]}-${sortedIds[1]}`;
-        };
-
-        const dmTopic = getDMTopic(userId, selectedDM);
         const response = await GetMessages({
           id: dmChannelId,
           queryParams: {
             offset: 0,
             limit: 100,
-            name: dmTopic
+            name: dmTopic,
+            order: "time",
+            dir: "asc",
           },
         });
 
@@ -82,12 +85,7 @@ export function ChatView({
     };
 
     fetchMessages();
-  }, [channelInfo?.id, selectedDM, dmChannelId, userId, setMessages, setChanMessages]);
-
-  const getDMTopic = (userId1: string, userId2: string): string => {
-    const sortedIds = [userId1, userId2].sort();
-    return `${sortedIds[0]}-${sortedIds[1]}`;
-  };
+  }, [channelInfo?.id, selectedDM, dmTopic, dmChannelId, userId, setMessages, setChanMessages]);
 
 
   useEffect(() => {
@@ -143,13 +141,11 @@ export function ChatView({
   const handleSend = (input: string) => {
     if (input.trim()) {
       if (selectedDM && userId) {
-        const dmTopic = getDMTopic(userId, selectedDM);
-
         sendMessage({
-          n: dmTopic, 
-          vs: input, 
-          t: Date.now() * 1e6, 
-          publisher: userId, 
+          n: dmTopic,
+          vs: input,
+          t: Date.now() * 1e6,
+          publisher: userId,
         })
       } else {
         sendMessage({
@@ -161,6 +157,14 @@ export function ChatView({
       }
     }
   }
+
+  useEffect(() => {
+    if (selectedDM) {
+      setActiveTopic(dmTopic);
+    } else {
+      setActiveTopic(null);
+    }
+  }, [selectedDM, dmTopic, setActiveTopic]);
 
   useEffect(() => {
     const getMembers = async () => {
@@ -197,6 +201,7 @@ export function ChatView({
     );
   }
 
+
   return (
     <div className="flex-1 flex flex-col bg-white">
       <div className="border-b px-4 py-3 flex items-center justify-between">
@@ -205,7 +210,7 @@ export function ChatView({
             <Menu className="h-5 w-5" />
           </Button>
 
-          {selectedDM && selectedChannel ? (
+          {selectedDM ? (
             <>
               <MessageCircle className="h-5 w-5 text-gray-500" />
               <div>
