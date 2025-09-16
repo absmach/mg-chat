@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
 
-export const CreateChannel = async (channel: Channel) => {
-  const { accessToken, domainId } = await validateOrGetToken("");
+export const CreateChannel = async (channel: Channel, domainId: string) => {
+  const { accessToken } = await validateOrGetToken("");
   try {
     const newChannel = await mgSdk.Channels.CreateChannel(
       channel,
