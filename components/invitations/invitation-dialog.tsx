@@ -59,7 +59,6 @@ const InvitationManager = ({
     invitations,
     domainId,
 }: InvitationManagerProps) => {
-    console.log("domainId", domainId);
     const isValidDate = (date?: Date): boolean => {
         if (!date) return false;
 
@@ -130,12 +129,6 @@ const InvitationManager = ({
             {invitations.map((invitation, index) => {
                 const invitationId = `${invitation.invitee_user_id}-${invitation.domain_id}-${index}`;
                 const status = getInvitationState(invitation);
-                console.log(
-                    "confirmed time",
-                    invitation.confirmed_at,
-                    "rejected time",
-                    invitation.rejected_at
-                );
 
                 return (
                     <Card key={invitationId} className="overflow-hidden">

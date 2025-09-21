@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
+import { Menu, Hash, MessageCircle } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
-import { Channel, ChannelsPage, Client } from "@absmach/magistrala-sdk";
-import { ListChannelMembers, ViewChannel } from "@/lib/channels";
+import { Channel, ChannelsPage, UserBasicInfo } from "@absmach/magistrala-sdk";
+import {  ListChannelRoles, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
 import { UserProfile } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
+import { ChatMenu } from "./chat-menu";
+import { EntityFetchData } from "@/lib/actions";
+import { ListChannelRoleMembers } from "@/lib/roles";
 
 interface Props {
   selectedChannel: string | null;
@@ -18,6 +21,7 @@ interface Props {
   setSelectedChannel: (channel: string | null) => void;
   session: Session;
   domainId: string;
+  initMembers: EntityFetchData;
 }
 
 export function ChatView({
@@ -26,13 +30,14 @@ export function ChatView({
   selectedDM,
   session,
   domainId,
+  initMembers,
 }: Props) {
   const { messages, setMessages, sendMessage, connect, disconnect } = useWebSocket();
   const { domain } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
-  const [members, setMembers] = useState<Client[]>([]);
-  const [userId, setUserId]= useState("");
+  const [members, setMembers] = useState<UserBasicInfo[]>([]);
+  const [userId, setUserId] = useState("");
   const [chanMessages, setChanMessages] = useState(messages);
 
   useEffect(() => {
@@ -40,11 +45,12 @@ export function ChatView({
       const getMessages = async () => {
         const response = await GetMessages({
           id: channelInfo?.id as string,
-          queryParams: { 
-            offset: 0, 
+          queryParams: {
+            offset: 0,
             limit: 100,
             order: "time",
-            dir: "asc" },
+            dir: "asc"
+          },
         });
 
         if (response.data) {
@@ -121,15 +127,22 @@ export function ChatView({
 
   useEffect(() => {
     const getMembers = async () => {
-      const response = await ListChannelMembers(
+      const roleResponse = await ListChannelRoles({
+        queryParams: { offset: 0, limit: 10 },
+      });
+
+      const memberRole = roleResponse?.data?.roles?.find(
+        (role) => role.name === "chat-member"
+      );
+
+      const roleId = memberRole?.id as string;
+      const response = await ListChannelRoleMembers(
+        selectedChannel as string,
+        roleId,
         {
-          id: selectedChannel as string,
-          queryParams: {
-            offset: 0,
-            limit: 100,
-          },
-        },
-        domainId as string 
+        offset: 0,
+        limit: 100,
+      },
       );
       if (response.data) {
         setMembers(response.data.members);
@@ -171,11 +184,11 @@ export function ChatView({
           <div>
             <h2 className="font-semibold text-gray-900">{channelInfo?.name}</h2>
             {channelInfo?.tags?.includes("chat") && (
-              <p className="text-xs text-gray-500">{members?.length} {members?.length === 1 ? "member": "members"}</p>
+              <p className="text-xs text-gray-500">{members?.length} {members?.length === 1 ? "member" : "members"}</p>
             )}
           </div>
         </div>
-        <EllipsisVertical className="h-4 w-4" />
+        <ChatMenu channelId={channelInfo?.id as string} chatName={channelInfo?.name as string} domainId={domain?.id as string} initMembers={initMembers} />
       </div>
 
       <div className="flex-1 flex flex-col">
@@ -184,7 +197,7 @@ export function ChatView({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
         ) : (
-            <MessageList messages={messages} userId={userId as string} />
+          <MessageList messages={messages} userId={userId as string} />
         )}
 
         <div className="border p-6 m-4 rounded-md">
