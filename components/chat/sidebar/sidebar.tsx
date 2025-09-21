@@ -11,7 +11,7 @@ import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
 import { Channel, InvitationsPage } from "@absmach/magistrala-sdk";
-import { Member, Metadata } from "@/types/entities";
+import { Member } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
 
@@ -21,7 +21,6 @@ interface Props {
   selectedDM: string | null;
   setSelectedChannel: (channelId: string | null) => void;
   setSelectedDM: (userId: string | null) => void;
-  metadata: Metadata;
   members: Member[];
   invitationsPage: InvitationsPage;
   dmChannelId: string
@@ -33,7 +32,6 @@ export function Sidebar({
   selectedDM,
   setSelectedChannel,
   setSelectedDM,
-  metadata,
   members,
   invitationsPage,
   dmChannelId,
@@ -155,7 +153,6 @@ export function Sidebar({
               {members?.map((dmUser) => {
                 
                 return (
-                  <>
                   <Button
                     key={dmUser.id}
                     variant="ghost"
@@ -186,7 +183,6 @@ export function Sidebar({
                     </div>
                     <span className="text-sm truncate">{dmUser.credentials?.username}</span>
                   </Button>
-                  </>
                 );
               })}
             </div>

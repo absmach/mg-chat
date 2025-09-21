@@ -2,8 +2,7 @@ import { getServerSession } from "@/lib/nextauth";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { ListDomainUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
-import { ViewUser } from "@/lib/users";
-import { Member, Metadata } from "@/types/entities";
+import { Member } from "@/types/entities";
 import { GetDomainInvitations } from "@/lib/invitations";
 import { InvitationsPage } from "@absmach/magistrala-sdk";
 import { ListChannels } from "@/lib/channels";
@@ -19,7 +18,6 @@ export default async function Page({ searchParams }: Props) {
   const workspaces = await ListWorkspaces({
     queryParams: { limit: 100, offset: 0 },
   });
-  const userResponse = await ViewUser(session?.user?.id as string)
 
   if (workspaces.error !== null) {
     return <div>{workspaces.error}</div>;
@@ -51,7 +49,6 @@ export default async function Page({ searchParams }: Props) {
       />
       <ChatPage
         session={session}
-        metadata={userResponse.data?.metadata as Metadata}
         members={memResponse.data?.members as Member[]}
         invitationsPage={inviResponse?.data as InvitationsPage}
         dmChannelId={dmChannelId as string} />
