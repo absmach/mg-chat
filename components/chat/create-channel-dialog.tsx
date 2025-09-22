@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateRule } from "@/lib/rules";
 import { Metadata, OutputType } from "@/types/entities";
+import { CreateChannelRole } from "@/lib/roles";
 interface Props {
   setRevalidate: (value: boolean) => void;
   metadata: Metadata;
@@ -67,10 +68,20 @@ export function CreateChannelDialog({ setRevalidate }: Props) {
       if (ruleResponse.error !== null) {
         toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
       } else {
+        const optionalActions = ["read", "publish", "subscribe", "view_role_users"];
+        const roleResponse = await CreateChannelRole(
+          response?.data?.id as string,
+          "chat-member",
+          optionalActions,
+        );
+        if (roleResponse.error !== null) {
+          toast.error(`Failed to create role with error: ${ruleResponse.error}`, { id: toastId });
+        } else {
         setRevalidate(true);
         toast.success("Channel created successfully", { id: toastId });
         setName("");
         setOpen(false);
+        }
       }
     }
     setIsLoading(false);

@@ -32,3 +32,18 @@ export interface Option {
   /** Group the options by providing key. */
   [key: string]: string | boolean | undefined;
 }
+
+export enum EntityType {
+  User = "user",
+  Channel = "channel",
+  Domain = "domain",
+  Member = "member",
+  Role = "role",
+}
+
+export interface RoleMembersPage {
+  total: number;
+  limit: number;
+  offset: number;
+  members: UserBasicInfo[];
+}

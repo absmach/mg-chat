@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Domain } from "@absmach/magistrala-sdk";
-import { CreateWorkspace } from "@/lib/workspace";
+import { CreateWorkspace, CreateWorkspaceRole } from "@/lib/workspace";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
@@ -29,7 +29,7 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
-   const toastId = toast("Sonner");
+    const toastId = toast("Sonner");
     e.preventDefault();
     if (!name.trim() && !route.trim()) return;
     toast.loading("Creating workspace ...", { id: toastId });
@@ -42,7 +42,13 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
 
     const result = await CreateWorkspace(newWorkspace);
     if (result.error === null) {
-      toast.success("Workspace created successfully", { id: toastId });
+      const optionalActions = ["read", "view_role_users", "channel_create"]
+      const roleResponse = await CreateWorkspaceRole("domain-member", result?.data?.id as string, optionalActions);
+      if (roleResponse.error !== null) {
+        toast.error(`Failed to create workspace role with error: ${roleResponse.error}`, { id: toastId });
+      } else {
+        toast.success("Workspace created successfully", { id: toastId });
+      }
     } else {
       toast.error(`Failed to create workspace with error: ${result.error}`, { id: toastId });
     }

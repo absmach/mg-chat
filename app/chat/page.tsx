@@ -3,9 +3,11 @@ import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { ListDomainUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
 import { ViewUser } from "@/lib/users";
-import { Member, Metadata } from "@/types/entities";
+import { EntityType, Member, Metadata } from "@/types/entities";
 import { GetDomainInvitations } from "@/lib/invitations";
 import { InvitationsPage } from "@absmach/magistrala-sdk";
+import { EntityFetchData, FetchData } from "@/lib/actions";
+import { RequestOptions } from "@/lib/magistrala";
 
 export type Props = {
   searchParams?: Promise<{
@@ -38,6 +40,19 @@ export default async function Page({searchParams}: Props) {
           state: status,
       });
 
+  const getDomainUsers = ({ id, queryParams }: RequestOptions) => {
+    return ListDomainUsers(id!, queryParams);
+  };
+
+  const initMembers = await FetchData(
+    EntityType.Member,
+    {
+      offset: 0,
+      limit: 20,
+      status: "enabled",
+    },
+    getDomainUsers,
+  );
   return (
     <div className="h-screen flex bg-gray-100">
       <WorkspaceSwitcher
@@ -48,6 +63,7 @@ export default async function Page({searchParams}: Props) {
       session={session} 
       metadata={userResponse.data?.metadata as Metadata} 
       members={memResponse.data?.members as Member[]}
+      initMembers={initMembers}
       invitationsPage={inviResponse?.data as InvitationsPage}
       status={status}
       />
