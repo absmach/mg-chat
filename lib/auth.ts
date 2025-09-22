@@ -135,3 +135,8 @@ export const WorkspaceLoginSession = async (
     throw new Error(error);
   }
 };
+
+export enum UserRole {
+  Admin = "admin",
+  User = "user",
+}

@@ -32,3 +32,19 @@ export interface Option {
   /** Group the options by providing key. */
   [key: string]: string | boolean | undefined;
 }
+
+export enum EntityType {
+  User = "user",
+  Channel = "channel",
+  Domain = "domain",
+  Member = "member",
+  Role = "role",
+  Pat = "pat",
+  Workspace = "workspace"
+}
+
+export enum Status {
+  Enabled = "enabled",
+  Disabled = "disabled",
+  All = "all",
+}

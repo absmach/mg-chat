@@ -14,6 +14,7 @@ import { Channel, InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { Member } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
+import { NotificationsBell } from "@/components/invitations/view-invitations";
 
 interface Props {
   session: Session;
@@ -88,7 +89,7 @@ export function Sidebar({
       <div className="p-4 border-b flex items-center justify-between border-gray-700">
         <Button
           variant="ghost"
-          className="cursor-pointer w-8/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center"
+          className="cursor-pointer w-7/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center"
           onClick={handleSwitchWorkspace}
         >
           <Avatar>
@@ -105,7 +106,7 @@ export function Sidebar({
           </div> 
         </Button>
         <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} />
-
+        <NotificationsBell invitations={invitationsPage?.invitations} isSidebar={true} className="mt-4 ml-4"/>
       </div>
 
       <ScrollArea className="flex-1">

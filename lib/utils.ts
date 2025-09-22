@@ -92,3 +92,36 @@ export const validateTime = (time?: Date) => {
 
   return true;
 };
+
+export function toSentenseCase(val: string) {
+  if (!val || val.length === 0) {
+    return "";
+  }
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
+export function extractImageUuid(url: string): string | null {
+  const match = url.match(
+    /\/image\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})/,
+  );
+  return match ? (match[1] as string) : "";
+}
+
+export const lightDialogTheme = {
+  base00: "#ffffff", // Default background color
+  base01: "#f5f5f5",
+  base02: "#e0e0e0",
+  base03: "#d6d6d6",
+  base04: "#4d4d4c",
+  base05: "#5e5e5e",
+  base06: "#d6d6d6",
+  base07: "#1d1f21",
+  base08: "#c82829",
+  base09: "#f5871f",
+  base0A: "#eab700",
+  base0B: "#718c00",
+  base0C: "#3e999f",
+  base0D: "#4271ae",
+  base0E: "#8959a8",
+  base0F: "#a3685a",
+};

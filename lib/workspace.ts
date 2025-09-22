@@ -249,6 +249,63 @@ export async function ProcessEntityMembers(
   }
 }
 
+export const EnableWorkspace = async (id: string) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    await mgSdk.Domains.EnableDomain(id, accessToken);
+    return {
+      data: "Workspace enabled",
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/info");
+  }
+};
+
+export const DisableWorkspace = async (id: string) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    await mgSdk.Domains.DisableDomain(id, accessToken);
+    return {
+      data: "Workspace disabled",
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/info");
+  }
+};
+
+export const UpdateWorkspace = async (workspace: Domain) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    const updated = await mgSdk.Domains.UpdateDomain(workspace, accessToken);
+    return {
+      data: updated.name as string,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/info");
+  }
+};
+
 export const GetWorkspaceInfo = async (listRoles?: boolean) => {
   try {
     const { accessToken, domainId } = await validateOrGetToken("");

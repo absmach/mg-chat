@@ -22,7 +22,7 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
     <>
       <div
         className={`
-            fixed lg:relative inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out
+            fixed lg:relative inset-y-0 left-0 z-50 w-[300px] shadow-lg transform transition-transform duration-300 ease-in-out
             
           `}
       >
