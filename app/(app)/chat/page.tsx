@@ -5,23 +5,24 @@ import { Member } from "@/types/entities";
 import { GetWorkspaceInvitations } from "@/lib/invitations";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { ListChannels } from "@/lib/channels";
-import { UserProfile } from "@/lib/users";
+import { UserProfile, ViewUser } from "@/lib/users";
 
 export type Props = {
-  searchParams?: Promise<{
-    status: string;
-  }>;
+	searchParams?: Promise<{
+		status: string;
+	}>;
 };
 
 export default async function Page({ searchParams }: Props) {
-  const session = await getServerSession();
-  const workspaces = await ListWorkspaces({
-    queryParams: { limit: 100, offset: 0 },
-  });
+	const session = await getServerSession();
+	const workspaces = await ListWorkspaces({
+		queryParams: { limit: 100, offset: 0 },
+	});
+	const userResponse = await ViewUser(session?.user?.id as string);
 
-  if (workspaces.error !== null) {
-    return <div>{workspaces.error}</div>;
-  }
+	if (workspaces.error !== null) {
+		return <div>{workspaces.error}</div>;
+	}
   const workspaceId = session?.workspace?.id as string;
   const memResponse = await ListWorkspaceUsers(workspaceId,
     {
