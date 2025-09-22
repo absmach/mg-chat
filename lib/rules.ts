@@ -13,7 +13,6 @@ export const CreateRule = async ({rule, domain}: {rule: Rule, domain?: string}) 
       error: null,
     };
   } catch (err: unknown) {
-    console.log("err", err);
     const knownError = err as HttpError;
     return {
       data: null,
