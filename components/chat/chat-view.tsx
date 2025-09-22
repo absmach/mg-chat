@@ -6,14 +6,14 @@ import { Menu, Hash, MessageCircle } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
 import { Channel, ChannelsPage, UserBasicInfo } from "@absmach/magistrala-sdk";
-import {  ListChannelRoles, ViewChannel } from "@/lib/channels";
+import { ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
 import { UserProfile } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
 import { ChatMenu } from "./chat-menu";
 import { EntityFetchData } from "@/lib/actions";
-import { ListChannelRoleMembers } from "@/lib/roles";
+import { ListChannelRoleMembers, ListChannelRoles } from "@/lib/roles";
 
 interface Props {
   selectedChannel: string | null;
