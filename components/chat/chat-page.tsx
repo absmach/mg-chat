@@ -5,15 +5,16 @@ import { ChatView } from "@/components/chat/chat-view";
 import { Session } from "@/types/auth";
 import { useState } from "react";
 import { Member } from "@/types/entities";
-import { InvitationsPage } from "@absmach/magistrala-sdk";
+import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 
 interface Props {
   session: Session;
   members: Member[];
   invitationsPage: InvitationsPage;
   dmChannelId: string;
+  user: User
 }
-export default function ChatPage({ session, members, invitationsPage, dmChannelId }: Props) {
+export default function ChatPage({ session, members, invitationsPage, dmChannelId, user }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(session?.user?.id as string);
   const domainId = session.domain?.id;
@@ -34,6 +35,7 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
           members={members}
           invitationsPage={invitationsPage}
           dmChannelId={dmChannelId as string} 
+          user={user}
         />
       </div>
 

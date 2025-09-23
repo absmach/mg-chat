@@ -10,7 +10,7 @@ import { Session } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
-import { Channel, InvitationsPage } from "@absmach/magistrala-sdk";
+import { Channel, InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { Member } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
@@ -23,7 +23,8 @@ interface Props {
   setSelectedDM: (userId: string | null) => void;
   members: Member[];
   invitationsPage: InvitationsPage;
-  dmChannelId: string
+  dmChannelId: string;
+  user: User;
 }
 
 export function Sidebar({
@@ -35,6 +36,7 @@ export function Sidebar({
   members,
   invitationsPage,
   dmChannelId,
+  user,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
@@ -191,7 +193,7 @@ export function Sidebar({
         </div>
       </ScrollArea>
 
-      <NavUser session={session} />
+      <NavUser user={user} />
     </div>
   );
 }

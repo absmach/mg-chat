@@ -4,8 +4,9 @@ import { ListDomainUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
 import { Member } from "@/types/entities";
 import { GetDomainInvitations } from "@/lib/invitations";
-import { InvitationsPage } from "@absmach/magistrala-sdk";
+import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { ListChannels } from "@/lib/channels";
+import { UserProfile } from "@/lib/users";
 
 export type Props = {
   searchParams?: Promise<{
@@ -40,6 +41,7 @@ export default async function Page({ searchParams }: Props) {
     queryParams: { offset: 0, limit: 1, tag: "dm" },
   });
   const dmChannelId = dmChannelResponse?.data?.channels?.[0]?.id;
+  const user = await UserProfile(session.accessToken);
 
   return (
     <div className="h-screen flex bg-gray-100">
@@ -51,7 +53,9 @@ export default async function Page({ searchParams }: Props) {
         session={session}
         members={memResponse.data?.members as Member[]}
         invitationsPage={inviResponse?.data as InvitationsPage}
-        dmChannelId={dmChannelId as string} />
+        dmChannelId={dmChannelId as string} 
+        user={user.data as User}
+        />
     </div>
   );
 }

@@ -248,3 +248,30 @@ export async function ProcessEntityMembers(
     throw error;
   }
 }
+
+export const GetWorkspaceInfo = async (listRoles?: boolean) => {
+  try {
+    const { accessToken, domainId } = await validateOrGetToken("");
+    if (domainId !== "") {
+      const workspace = await mgSdk.Domains.Domain(
+        domainId,
+        accessToken,
+        listRoles,
+      );
+      return {
+        data: workspace,
+        error: null,
+      };
+    }
+    return {
+      data: null,
+      error: "missing workspace in token",
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  }
+};

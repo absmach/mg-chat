@@ -70,3 +70,25 @@ export const createPageUrl = (
 
   return `${pathname}?${params.toString()}`;
 };
+
+
+export const validateTime = (time?: Date) => {
+  if (!time) {
+    return false;
+  }
+  const zeroTimestamps = [
+    "0001-01-01T00:00:00Z", // .NET DateTime.MinValue
+    "1970-01-01T00:00:00Z", // Unix epoch
+    "0000-00-00T00:00:00Z", // Some database null values
+  ];
+
+  if (zeroTimestamps.includes(time.toString())) {
+    return false;
+  }
+
+  if (Number.isNaN(time)) {
+    return false;
+  }
+
+  return true;
+};
