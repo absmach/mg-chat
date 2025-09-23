@@ -11,7 +11,7 @@ import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
 import { Channel, InvitationsPage } from "@absmach/magistrala-sdk";
-import { Member, Metadata } from "@/types/entities";
+import { Member } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
 
@@ -21,9 +21,9 @@ interface Props {
   selectedDM: string | null;
   setSelectedChannel: (channelId: string | null) => void;
   setSelectedDM: (userId: string | null) => void;
-  metadata: Metadata;
   members: Member[];
   invitationsPage: InvitationsPage;
+  dmChannelId: string
 }
 
 export function Sidebar({
@@ -32,13 +32,13 @@ export function Sidebar({
   selectedDM,
   setSelectedChannel,
   setSelectedDM,
-  metadata,
   members,
   invitationsPage,
+  dmChannelId,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
-  const [directMessages, setDirectMessages] = useState<Channel[]>([]);
+  const [directMessages, setDirectMessages] = useState<string | null>(null);
 
   const workspaceId = session.domain?.id;
 
@@ -53,12 +53,12 @@ export function Sidebar({
     }
 
     const directResponse = await ListChannels({
-      queryParams: { offset: 0, limit: 100, tag: "direct" },
+      queryParams: { offset: 0, limit: 1, tag: "dm" },
     });
     if (directResponse.data) {
-      setDirectMessages(directResponse.data.channels);
+      setDirectMessages(directResponse.data.channels?.[0]?.id as string);
     } else {
-      setDirectMessages([]);
+      setDirectMessages(null);
     }
   }, []);
 
@@ -80,6 +80,7 @@ export function Sidebar({
   };
 
   const domain = session.domain;
+
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
       <div className="p-4 border-b flex items-center justify-between border-gray-700">
@@ -112,7 +113,7 @@ export function Sidebar({
               <span className="text-sm font-medium text-gray-300">
                 Channels
               </span>
-              <CreateChannelDialog setRevalidate={setRevalidate} metadata={metadata}/>
+              <CreateChannelDialog setRevalidate={setRevalidate} domainId={domain?.id as string}/>
             </div>
 
             <div className="space-y-1">
@@ -160,6 +161,10 @@ export function Sidebar({
                         ? "bg-purple-600 text-white hover:bg-purple-700"
                         : ""
                     }`}
+                    onClick={() => {
+                      setSelectedDM(dmUser.id as string)
+                      setSelectedChannel(dmChannelId)
+                    }}
                   >
                     <div className="relative mr-2">
                       <Avatar className="h-6 w-6">

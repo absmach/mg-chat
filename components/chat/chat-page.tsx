@@ -4,21 +4,19 @@ import { Sidebar } from "@/components/chat/sidebar/sidebar";
 import { ChatView } from "@/components/chat/chat-view";
 import { Session } from "@/types/auth";
 import { useState } from "react";
-import { Member, Metadata } from "@/types/entities";
+import { Member } from "@/types/entities";
 import { InvitationsPage } from "@absmach/magistrala-sdk";
 
 interface Props {
   session: Session;
-  metadata: Metadata;
   members: Member[];
   invitationsPage: InvitationsPage;
-  status: string
+  dmChannelId: string;
 }
-export default function ChatPage({ session, metadata, members, invitationsPage, status }: Props) {
+export default function ChatPage({ session, members, invitationsPage, dmChannelId }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
-  const [selectedDM, setSelectedDM] = useState<string | null>(null);
+  const [selectedDM, setSelectedDM] = useState<string | null>(session?.user?.id as string);
   const domainId = session.domain?.id;
-
   return (
     <>
       <div
@@ -33,9 +31,9 @@ export default function ChatPage({ session, metadata, members, invitationsPage, 
           selectedDM={selectedDM}
           setSelectedChannel={setSelectedChannel}
           setSelectedDM={setSelectedDM}
-          metadata={metadata}
           members={members}
           invitationsPage={invitationsPage}
+          dmChannelId={dmChannelId as string} 
         />
       </div>
 
@@ -46,6 +44,7 @@ export default function ChatPage({ session, metadata, members, invitationsPage, 
           selectedDM={selectedDM}
           session={session}
           domainId={domainId as string}
+          dmChannelId={dmChannelId as string} 
         />
       </div>
     </>

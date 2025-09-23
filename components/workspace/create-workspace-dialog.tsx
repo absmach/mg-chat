@@ -14,10 +14,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Domain } from "@absmach/magistrala-sdk";
+import { Domain, Rule } from "@absmach/magistrala-sdk";
 import { CreateWorkspace } from "@/lib/workspace";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { CreateChannel } from "@/lib/channels";
+import { OutputType } from "@/types/entities";
+import { CreateRule } from "@/lib/rules";
 
 interface Props {
   isMobile: boolean;
@@ -29,7 +32,7 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
-   const toastId = toast("Sonner");
+    const toastId = toast("Sonner");
     e.preventDefault();
     if (!name.trim() && !route.trim()) return;
     toast.loading("Creating workspace ...", { id: toastId });
@@ -41,16 +44,48 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
     };
 
     const result = await CreateWorkspace(newWorkspace);
-    if (result.error === null) {
-      toast.success("Workspace created successfully", { id: toastId });
-    } else {
+    if (result.error !== null) {
       toast.error(`Failed to create workspace with error: ${result.error}`, { id: toastId });
+    } else {
+      const createChanresp = await CreateChannel(
+        { name: "direct-message", tags: ["dm"] },
+        result.data.id as string
+      );
+
+      if (createChanresp.error !== null) {
+        toast.error(`Failed to create channel with error: ${createChanresp.error}`, { id: toastId });
+      } else {
+        const rule: Rule = {
+          input_channel: createChanresp.data.id,
+          input_topic: "",
+          outputs: [{ type: OutputType.SAVE_SENML }],
+          logic: {
+            type: 0,
+            value:
+              "\n" +
+              "        function logicFunction()\n" +
+              "   return message.payload\n" +
+              " end\n" +
+              "\n" +
+              "return logicFunction()\n" +
+              "      ",
+          },
+          name: `${createChanresp.data.name}save_messages`,
+        };
+
+        const ruleResponse = await CreateRule({rule, domain: result?.data?.id});
+        if (ruleResponse.error !== null) {
+          toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
+        } else {
+          toast.success("Workspace created successfully", { id: toastId });
+          setOpen(false);
+          setName("");
+          setRoute("");
+        }
+      }
     }
-    setOpen(false);
-    setName("");
-    setRoute("");
-    setIsLoading(false);
-  };
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={true}>

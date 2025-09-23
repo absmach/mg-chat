@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
-import { Channel, ChannelsPage, Client } from "@absmach/magistrala-sdk";
+import { Channel, ChannelsPage, Client, User } from "@absmach/magistrala-sdk";
 import { ListChannelMembers, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
-import { UserProfile } from "@/lib/users";
+import { UserProfile, ViewUser } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
 
 interface Props {
@@ -18,6 +18,7 @@ interface Props {
   setSelectedChannel: (channel: string | null) => void;
   session: Session;
   domainId: string;
+  dmChannelId: string;
 }
 
 export function ChatView({
@@ -26,35 +27,64 @@ export function ChatView({
   selectedDM,
   session,
   domainId,
+  dmChannelId,
 }: Props) {
-  const { messages, setMessages, sendMessage, connect, disconnect } = useWebSocket();
+  const [userId, setUserId] = useState(session?.user?.id);
+  const getDMTopic = (userId1: string, userId2: string): string => {
+    const sortedIds = [userId1, userId2].sort();
+    return `${sortedIds[0]}-${sortedIds[1]}`;
+  };
+
+  const dmTopic = getDMTopic(userId as string, selectedDM as string);
+  const { messages, setMessages, sendMessage, connect, setActiveTopic } = useWebSocket();
   const { domain } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Client[]>([]);
-  const [userId, setUserId]= useState("");
-  const [chanMessages, setChanMessages] = useState(messages);
+  const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
 
   useEffect(() => {
-    if (channelInfo?.id) {
-      const getMessages = async () => {
+    const fetchMessages = async () => {
+      setIsLoading(true)
+      if (channelInfo?.id && !selectedDM) {
         const response = await GetMessages({
           id: channelInfo?.id as string,
-          queryParams: { 
-            offset: 0, 
+          queryParams: {
+            offset: 0,
             limit: 100,
             order: "time",
-            dir: "asc" },
+            dir: "asc"
+          },
         });
 
         if (response.data) {
           setMessages(response.data.messages);
         }
-      };
+        return;
+      }
 
-      getMessages();
-    }
-  }, [channelInfo?.id, setMessages]);
+      if (selectedDM && dmChannelId && userId) {
+        const response = await GetMessages({
+          id: dmChannelId,
+          queryParams: {
+            offset: 0,
+            limit: 100,
+            name: dmTopic,
+            order: "time",
+            dir: "asc",
+          },
+        });
+
+        if (response.data) {
+          setMessages(response.data.messages);
+        }
+      }
+      setIsLoading(false)
+    };
+
+    fetchMessages();
+  }, [channelInfo?.id, selectedDM, dmTopic, dmChannelId, userId, setMessages]);
+
 
   useEffect(() => {
     const connectSocket = async () => {
@@ -70,10 +100,8 @@ export function ChatView({
     if (selectedChannel && domain?.id) {
       connectSocket();
     }
-    return () => {
-      disconnect();
-    };
-  }, [domain, selectedChannel, disconnect, connect]);
+
+  }, [domain, selectedChannel, connect]);
 
   useEffect(() => {
     const getData = async () => {
@@ -88,36 +116,52 @@ export function ChatView({
           setChannelInfo(response.data);
         }
       } else {
-        setChannelInfo(null);
+        setSelectedChannel(selectedChannel);
       }
     };
 
     getData();
   }, [selectedChannel, setSelectedChannel]);
 
-  const handleSend = (input: string) => {
-    if (input.trim()) {
-      sendMessage({
-        n: "chat",
-        vs: input,
-        t: Date.now() * 1e6,
-        publisher: userId,
-      });
-    }
-  };
-
   useEffect(() => {
-    const getMessage = async () => {
-      const response = await GetMessages({
-        id: channelInfo?.id as string,
-        queryParams: { offset: 0, limit: 100, protocol: "websocket" }
-      });
+    const getData = async () => {
+      const response = await ViewUser(selectedDM || "");
       if (response.data) {
-        setChanMessages(response.data.messages);
+        setDmUserInfo(response.data);
       }
     };
-    getMessage();
-  }, [channelInfo?.id]);
+
+    getData();
+  }, [selectedDM]);
+
+  const handleSend = (input: string) => {
+    if (input.trim()) {
+      if (selectedDM && userId) {
+        sendMessage({
+          n: dmTopic,
+          vs: input,
+          t: Date.now() * 1e6,
+          publisher: userId,
+        })
+      } else {
+        sendMessage({
+          n: "chat",
+          vs: input,
+          t: Date.now() * 1e6,
+          publisher: userId,
+        })
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (selectedDM) {
+      setMessages([])
+      setActiveTopic(dmTopic);
+    } else {
+      setActiveTopic(null);
+    }
+  }, [selectedDM, dmTopic, setActiveTopic, setMessages]);
 
   useEffect(() => {
     const getMembers = async () => {
@@ -129,7 +173,7 @@ export function ChatView({
             limit: 100,
           },
         },
-        domainId as string 
+        domainId as string
       );
       if (response.data) {
         setMembers(response.data.members);
@@ -154,6 +198,7 @@ export function ChatView({
     );
   }
 
+
   return (
     <div className="flex-1 flex flex-col bg-white">
       <div className="border-b px-4 py-3 flex items-center justify-between">
@@ -162,18 +207,26 @@ export function ChatView({
             <Menu className="h-5 w-5" />
           </Button>
 
-          {channelInfo?.tags?.includes("chat") ? (
-            <Hash className="h-5 w-5 text-gray-500" />
+          {selectedDM ? (
+            <>
+              <MessageCircle className="h-5 w-5 text-gray-500" />
+              <div>
+                <h2 className="font-semibold text-gray-900">{dmUserInfo?.credentials?.username}</h2>
+              </div>
+            </>
           ) : (
-            <MessageCircle className="h-5 w-5 text-gray-500" />
+            <>
+              <Hash className="h-5 w-5 text-gray-500" />
+              <div>
+                <h2 className="font-semibold text-gray-900">{channelInfo?.name}</h2>
+                {channelInfo?.tags?.includes("chat") && (
+                  <p className="text-xs text-gray-500">
+                    {members?.length} {members?.length === 1 ? "member" : "members"}
+                  </p>
+                )}
+              </div>
+            </>
           )}
-
-          <div>
-            <h2 className="font-semibold text-gray-900">{channelInfo?.name}</h2>
-            {channelInfo?.tags?.includes("chat") && (
-              <p className="text-xs text-gray-500">{members?.length} {members?.length === 1 ? "member": "members"}</p>
-            )}
-          </div>
         </div>
         <EllipsisVertical className="h-4 w-4" />
       </div>
@@ -184,7 +237,7 @@ export function ChatView({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
         ) : (
-            <MessageList messages={messages} userId={userId as string} />
+          <MessageList messages={messages} userId={userId as string} />
         )}
 
         <div className="border p-6 m-4 rounded-md">
