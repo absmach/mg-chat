@@ -93,7 +93,6 @@ export function Sidebar({
           onClick={handleSwitchWorkspace}
         >
           <Avatar>
-            <AvatarImage src={"/placeholder.svg"} />
             <AvatarFallback className=" text-black">
               {workspace?.name?.charAt(0) || "U"}
             </AvatarFallback>

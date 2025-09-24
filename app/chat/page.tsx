@@ -24,7 +24,7 @@ export default async function Page({ searchParams }: Props) {
     return <div>{workspaces.error}</div>;
   }
   const workspaceId = session?.workspace?.id as string;
-  const memResponse = await ListDomainUsers(workspaceId,
+  const memResponse = await ListWorkspaceUsers(workspaceId,
     {
       offset: 0,
       limit: 100,
