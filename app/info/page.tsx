@@ -1,6 +1,6 @@
 import { getServerSession } from "@/lib/nextauth";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
-import { GetDomainInfo, ListWorkspaces } from "@/lib/workspace";
+import { GetWorkspaceInfo, ListWorkspaces } from "@/lib/workspace";
 import { Domain } from "@absmach/magistrala-sdk";
 import InfoPage from "@/components/info/info-page";
 
@@ -13,7 +13,7 @@ export default async function Page() {
     if (workspaces.error !== null) {
         return <div>{workspaces.error}</div>;
     }
-    const domainResponse = await GetDomainInfo(true);
+    const domainResponse = await GetWorkspaceInfo(true);
 
     return (
         <div className="h-screen flex bg-gray-100">

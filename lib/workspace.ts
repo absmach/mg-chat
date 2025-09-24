@@ -29,10 +29,10 @@ export const CreateWorkspace = async (workspace: Domain) => {
 export const ListWorkspaces = async ({ queryParams }: RequestOptions) => {
   try {
     const { accessToken } = await validateOrGetToken("");
-    const domainsPage = await mgSdk.Domains.Domains(queryParams, accessToken);
+    const workspacePage = await mgSdk.Domains.Domains(queryParams, accessToken);
 
     return {
-      data: domainsPage,
+      data: workspacePage,
       error: null,
     };
   } catch (err: unknown) {
@@ -46,7 +46,7 @@ export const ListWorkspaces = async ({ queryParams }: RequestOptions) => {
   }
 };
 
-export const AddDomainRoleMembers = async (
+export const AddWorkspaceRoleMembers = async (
   domainId: string,
   roleId: string,
   members: string[],
@@ -74,17 +74,17 @@ export const AddDomainRoleMembers = async (
   }
 };
 
-export const GetDomainBasicInfo = async (domainId: string) => {
+export const GetWorkspaceBasicInfo = async (workspaceId: string) => {
   try {
     const { accessToken } = await validateOrGetToken("");
-    const domain = await mgSdk.Domains.Domain(domainId, accessToken);
+    const workspace = await mgSdk.Domains.Domain(workspaceId, accessToken);
     return {
-      id: domain.id,
-      name: domain.name,
-      route: domain.route,
+      id: workspace.id,
+      name: workspace.name,
+      route: workspace.route,
     } as DomainBasicInfo;
   } catch (_error) {
-    return domainId;
+    return workspaceId;
   }
 };
 
@@ -107,7 +107,7 @@ export async function GetUserBasicInfo(userId: string, token = "") {
   }
 }
 
-export const ListDomainRoles = async ({ queryParams }: RequestOptions) => {
+export const ListWorkspaceRoles = async ({ queryParams }: RequestOptions) => {
   const { domainId, accessToken } = await validateOrGetToken("");
   try {
     const rolesPage = await mgSdk.Domains.ListDomainRoles(
@@ -178,7 +178,7 @@ export async function ProcessRoles(
 }
 
 
-export const ListDomainUsers = async (
+export const ListWorkspaceUsers = async (
   domainId: string,
   queryParams: RequestOptions["queryParams"],
 ) => {

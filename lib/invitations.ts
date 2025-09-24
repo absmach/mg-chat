@@ -3,7 +3,7 @@
 import { HttpError } from "@/types/errors";
 import { mgSdk, validateOrGetToken } from "./magistrala";
 import { revalidatePath } from "next/cache";
-import { GetDomainBasicInfo, GetUserBasicInfo } from "./workspace";
+import { GetWorkspaceBasicInfo, GetUserBasicInfo } from "./workspace";
 import { DomainBasicInfo, Invitation, InvitationPageMeta, InvitationsPage, UserBasicInfo } from "@absmach/magistrala-sdk";
 
 export const SendInvitation = async (
@@ -62,7 +62,7 @@ export const InviteMultipleUsersToDomain = async (
     }),
   );
 
-  const domainInfo = await GetDomainBasicInfo(domainId);
+  const domainInfo = await GetWorkspaceBasicInfo(domainId);
   const domainName =
     typeof domainInfo === "string" ? domainInfo : domainInfo.name;
 
@@ -196,7 +196,7 @@ async function processInvitations(
           typeof invitation.domain_id === "string"
             ? invitation.domain_id === ""
               ? invitation.domain_id
-              : await GetDomainBasicInfo(invitation.domain_id)
+              : await GetWorkspaceBasicInfo(invitation.domain_id)
             : (invitation.domain_id as DomainBasicInfo);
         const processedInvitation: Invitation = {
           ...invitation,

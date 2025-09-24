@@ -21,9 +21,9 @@ import {
 } from "@/components/ui/form";
 import UserSearchInput from "@/components/custom/user-search-input";
 import {
-    GetDomainBasicInfo,
+    GetWorkspaceBasicInfo,
     GetUserBasicInfo,
-    ListDomainRoles,
+    ListWorkspaceRoles,
 } from "@/lib/workspace";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -64,7 +64,7 @@ export function InviteMember({
             id: toastId,
         });
 
-        const roleResponse = await ListDomainRoles({
+        const roleResponse = await ListWorkspaceRoles({
             queryParams: { offset: 0, limit: 10 },
         });
 
@@ -85,7 +85,7 @@ export function InviteMember({
             }),
         );
 
-        const domain = await GetDomainBasicInfo(domainId);
+        const domain = await GetWorkspaceBasicInfo(domainId);
         const domainName =
             typeof domain === "object" && "name" in domain ? domain.name : domainId;
         const hasErrors = response.errors.some((e) => e !== null);

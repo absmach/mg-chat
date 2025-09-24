@@ -32,12 +32,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MoveLeft } from 'lucide-react';
 
-export default function DomainInfo({ domain }: { domain: Domain }) {
-    const roles = domain?.roles || [];
+export default function DomainInfo({ workspace }: { workspace: Domain }) {
+    const roles = workspace?.roles || [];
     const isDomainAdmin = roles.some(
         (role: MemberRoleActions) => role.role_name === "admin",
     );
-    const status = domain?.status;
+    const status = workspace?.status;
 
     const disabled = (!isDomainAdmin && status === Status.Disabled);
 
@@ -59,19 +59,19 @@ export default function DomainInfo({ domain }: { domain: Domain }) {
                                 colSpan={3}
                                 className="text-2xl font-bold whitespace-pre-wrap break-normal"
                             >
-                                {domain?.name}
+                                {workspace?.name}
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <UpdateNameRow
-                            id={domain?.id as string}
-                            name={domain?.name as string}
+                            id={workspace?.id as string}
+                            name={workspace?.name as string}
                             entity={EntityType.Workspace}
                             updateName={UpdateDomain}
                             disabled={disabled}
                         />
-                        <EntityIdRow id={domain?.id as string} label={"id"} />
+                        <EntityIdRow id={workspace?.id as string} label={"id"} />
                         <TableRow className="h-20">
                             <TableHead>
                                 <TooltipProvider>
@@ -80,7 +80,7 @@ export default function DomainInfo({ domain }: { domain: Domain }) {
                                             <span>Route</span>
                                         </TooltipTrigger>
                                         <TooltipContent>
-                                            Unique domain route used for subscribing. Cannot be
+                                            Unique workspace route used for subscribing. Cannot be
                                             changed after creation.
                                         </TooltipContent>
                                     </Tooltip>
@@ -89,9 +89,9 @@ export default function DomainInfo({ domain }: { domain: Domain }) {
 
                             <TableCell>
                                 <div className="flex flex-row justify-between">
-                                    <span className="me-1">{domain?.route}</span>
-                                    {domain?.route && domain?.route.length > 0 && (
-                                        <CopyButton data={domain?.route as string} />
+                                    <span className="me-1">{workspace?.route}</span>
+                                    {workspace?.route && workspace?.route.length > 0 && (
+                                        <CopyButton data={workspace?.route as string} />
                                     )}
                                 </div>
                             </TableCell>
@@ -101,15 +101,15 @@ export default function DomainInfo({ domain }: { domain: Domain }) {
                             <TableCell>
                                 <div
                                     className={cn("flex flex-row", {
-                                        "justify-between": domain?.tags && domain?.tags.length > 0,
-                                        "justify-end": !domain?.tags || domain?.tags.length === 0,
+                                        "justify-between": workspace?.tags && workspace?.tags.length > 0,
+                                        "justify-end": !workspace?.tags || workspace?.tags.length === 0,
                                     })}
                                 >
-                                    <DisplayTags tags={domain?.tags} />
+                                    <DisplayTags tags={workspace?.tags} />
                                     <div className=" flex flex-row gap-4">
                                         <UpdateTagsDialog
-                                            id={domain?.id as string}
-                                            tags={domain?.tags ? (domain?.tags as string[]) : []}
+                                            id={workspace?.id as string}
+                                            tags={workspace?.tags ? (workspace?.tags as string[]) : []}
                                             entity={EntityType.Workspace}
                                             updateTags={UpdateDomain}
                                             disabled={disabled}
@@ -122,8 +122,8 @@ export default function DomainInfo({ domain }: { domain: Domain }) {
                             <TableHead>Metadata</TableHead>
                             <TableCell>
                                 <MetadataComponent
-                                    metadata={domain?.metadata || {}}
-                                    id={domain?.id as string}
+                                    metadata={workspace?.metadata || {}}
+                                    id={workspace?.id as string}
                                     entity={EntityType.Workspace}
                                     updateMetadata={UpdateDomain}
                                     disabled={disabled}
@@ -135,14 +135,14 @@ export default function DomainInfo({ domain }: { domain: Domain }) {
                             <TableCell>
                                 <div className="flex flex-row justify-between">
                                     <span
-                                        className={domain?.status === Status.Enabled ? "text-green-600" : "text-red-600"}
+                                        className={workspace?.status === Status.Enabled ? "text-green-600" : "text-red-600"}
                                     >
-                                        {toSentenseCase(domain?.status as string)}
+                                        {toSentenseCase(workspace?.status as string)}
                                     </span>
                                     <div className="flex">
                                         <UpdateStatusDialog
-                                            status={domain?.status as Status}
-                                            domain={domain as Domain}
+                                            status={workspace?.status as Status}
+                                            workspace={workspace as Domain}
                                         />
                                     </div>
                                 </div>

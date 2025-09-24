@@ -39,7 +39,6 @@ invitationsPage: InvitationsPage
               }}
             >
               <span>Manage Invitations</span>
-              <DropdownMenuShortcut>⇧⌘I</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() => {
@@ -47,7 +46,6 @@ invitationsPage: InvitationsPage
               }}
             >
               <span>Edit Workspace</span>
-              <DropdownMenuShortcut>⇧⌘E</DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

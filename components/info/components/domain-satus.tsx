@@ -10,7 +10,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { DisableDomain, EnableDomain } from "@/lib/workspace";
+import { DisableWorkspace, EnableWorkspace } from "@/lib/workspace";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -65,7 +65,7 @@ export function DomainStatusDialog({
                                         id: toastId,
                                     });
 
-                                    const response = await DisableDomain(id);
+                                    const response = await DisableWorkspace(id);
                                     setProcessing(false);
                                     if (response.error === null) {
                                         toast.success(
@@ -91,7 +91,7 @@ export function DomainStatusDialog({
                                         id: toastId,
                                     });
 
-                                    const response = await EnableDomain(id);
+                                    const response = await EnableWorkspace(id);
                                     setProcessing(false);
                                     if (response.error === null) {
                                         toast.success(

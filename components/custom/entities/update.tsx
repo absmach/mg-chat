@@ -29,7 +29,7 @@ import {
     SaveButton,
 } from "@/components/custom/entities/buttons";
 import { UpdateServerSession } from "@/lib/actions";
-import { AddDomainRoleMembers } from "@/lib/workspace";
+import { AddWorkspaceRoleMembers } from "@/lib/workspace";
 import { toSentenseCase } from "@/lib/utils";
 import { EntityType } from "@/types/entities";
 import { type Tag, TagInput } from "emblor";
@@ -116,7 +116,7 @@ export function UpdateTagsDialog({
 
         const result = isTags
             ? await updateTags(updatedEntity)
-            : await AddDomainRoleMembers(id, roleName as string, updatedEntity.tags);
+            : await AddWorkspaceRoleMembers(id, roleName as string, updatedEntity.tags);
         setProcessing(false);
         if (result.error === null) {
             toast.success(

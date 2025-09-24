@@ -1,6 +1,6 @@
 import { getServerSession } from "@/lib/nextauth";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
-import { ListDomainUsers, ListWorkspaces } from "@/lib/workspace";
+import { ListWorkspaceUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
 import { Member } from "@/types/entities";
 import { GetDomainInvitations } from "@/lib/invitations";
