@@ -132,7 +132,7 @@ export function ChatView({
     };
 
     getData();
-  }, [selectedDM]);
+  }, [selectedDM, session]);
 
   const handleSend = (input: string) => {
     if (input.trim()) {
