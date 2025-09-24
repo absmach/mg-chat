@@ -36,6 +36,8 @@ export const UpdateUser = async (user: User) => {
       data: null,
       error: knownError.error || knownError.message || knownError.toString(),
     };
+  } finally {
+    revalidatePath("/chat");
   }
 };
 

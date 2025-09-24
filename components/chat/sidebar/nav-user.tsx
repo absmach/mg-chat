@@ -11,7 +11,7 @@ import { UpdateServerSession } from "@/lib/actions";
 import { UpdateUser, UpdateUserEmail, UpdateUsername } from "@/lib/users";
 import { User } from "@absmach/magistrala-sdk";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LogOut, Mail, UserIcon } from "lucide-react";
+import { CircleUser, LogOut, Mail, Shield, UserIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -173,7 +173,7 @@ export function NavUser({ user }: Props) {
         <SheetTrigger asChild>
           <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 rounded-lg p-2 -m-2">
             <Avatar>
-              <AvatarImage src={user?.profile_picture || "/placeholder.svg"} />
+              <AvatarImage src={user?.profile_picture} />
               <AvatarFallback className="bg-purple-600 text-white">{user?.credentials?.username?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -222,7 +222,10 @@ export function NavUser({ user }: Props) {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-white">About me</h3>
+                <div className="flex flex-row">
+                  <CircleUser className="h-6 w-6 text-white mr-2" />
+                  <h3 className="text-lg font-medium text-white">About me</h3>
+                </div>
                 <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
@@ -355,8 +358,11 @@ export function NavUser({ user }: Props) {
             <Separator className="bg-gray-700" />
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-white">Passwords</h3>
-                <PasswordSettingsForm isPasswordDialogOpen={isPasswordDialogOpen} setIsPasswordDialogOpen={setIsPasswordDialogOpen}/>
+                <div className="flex flex-row">
+                  <Shield className="h-6 w-6 text-white mr-2" />
+                  <h3 className="text-lg font-medium text-white">Passwords and security</h3>
+                </div>
+                <PasswordSettingsForm isPasswordDialogOpen={isPasswordDialogOpen} setIsPasswordDialogOpen={setIsPasswordDialogOpen} />
               </div>
             </div>
           </div>
