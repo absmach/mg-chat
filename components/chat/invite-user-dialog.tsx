@@ -30,7 +30,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Plus } from "lucide-react";
-import { InviteMultipleUsersToDomain } from "@/lib/invitations";
+import { InviteMultipleUsersToWorkspace } from "@/lib/invitations";
 
 const assignMembersSchema = () =>
     z.object({
@@ -41,10 +41,10 @@ const assignMembersSchema = () =>
     });
 
 interface AssignMemberProps {
-    domainId: string;
+    workspaceId: string;
 }
 export function InviteMember({
-    domainId,
+    workspaceId,
 }: AssignMemberProps) {
     const [open, setOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -74,7 +74,7 @@ export function InviteMember({
 
         const roleId = adminRole?.id as string;
 
-        const response = await InviteMultipleUsersToDomain(values.userIds, roleId, domainId);
+        const response = await InviteMultipleUsersToWorkspace(values.userIds, roleId, workspaceId);
 
         const userNames = await Promise.all(
             values.userIds.map(async (id) => {
@@ -85,9 +85,9 @@ export function InviteMember({
             }),
         );
 
-        const domain = await GetWorkspaceBasicInfo(domainId);
-        const domainName =
-            typeof domain === "object" && "name" in domain ? domain.name : domainId;
+        const workspace = await GetWorkspaceBasicInfo(workspaceId);
+        const workspaceName =
+            typeof workspace === "object" && "name" in workspace ? workspace.name : workspaceId;
         const hasErrors = response.errors.some((e) => e !== null);
         if (hasErrors) {
             toast.error(
@@ -98,7 +98,7 @@ export function InviteMember({
             );
         } else {
             toast.success(
-                `User(s) "${userNames.join(", ")}" added to workspace "${domainName}"`,
+                `User(s) "${userNames.join(", ")}" added to workspace "${workspaceName}"`,
                 { id: toastId },
             );
         }

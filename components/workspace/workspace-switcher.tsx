@@ -1,22 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Plus } from "lucide-react";
 import { CreateWorkspaceDialog } from "./create-workspace-dialog";
 import { WorkspaceLogin } from "@/lib/actions";
 import { DomainsPage } from "@absmach/magistrala-sdk";
-
-interface Workspace {
-  id: string;
-  name: string;
-  description?: string;
-  memberCount: number;
-  isOwner: boolean;
-}
 
 interface Props {
   selectedWorkspaceId: string | null;

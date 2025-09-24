@@ -17,7 +17,7 @@ type WebSocketContextType = {
   messages: SenMLMessage[];
   setMessages: Dispatch<SetStateAction<SenMLMessage[]>>;
   sendMessage: (msg: object) => void;
-  connect: (domainId: string, channelId: string) => void;
+  connect: (workspaceId: string, channelId: string) => void;
   disconnect: () => void;
   setActiveTopic: (topic: string | null) => void;
 };
@@ -33,8 +33,8 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const user = useSession();
   const token = user?.data?.accessToken;
 
-  const connect = (domainId: string, channelId: string) => {
-    const wsUrl = `ws://localhost:8186/m/${domainId}/c/${channelId}?authorization=Bearer%20${token}`;
+  const connect = (workspaceId: string, channelId: string) => {
+    const wsUrl = `ws://localhost:8186/m/${workspaceId}/c/${channelId}?authorization=Bearer%20${token}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {

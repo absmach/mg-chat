@@ -45,14 +45,14 @@ export function LoginAndGetUser(credential: Login): Promise<AuthUser> {
                 token.access_token,
               )
                 .then((mgDomain) => {
-                  const domain = {
+                  const workspace = {
                     id: mgDomain.id,
                     name: mgDomain.name,
                     route: mgDomain.route,
                   } as Domain;
                   resolve({
                     user,
-                    domain,
+                    workspace,
                     ...camelcaseKeysDeep(token),
                   } as AuthUser);
                 })
@@ -100,7 +100,7 @@ export const RefreshToken = (refreshToken: string): Promise<Token> => {
 export const WorkspaceLoginSession = async (
   csrfToken: string,
   sessionToken: string,
-  domainId: string,
+  workspaceId: string,
 ): Promise<string | undefined> => {
   try {
     const decodedToken = await decodeSessionToken(csrfToken, sessionToken);
@@ -110,7 +110,7 @@ export const WorkspaceLoginSession = async (
     const mgSdk = new SDK(sdkConf);
 
     const mgDomain = await mgSdk.Domains.Domain(
-      domainId,
+      workspaceId,
       decodedToken.accessToken as string,
       true,
     );
@@ -121,7 +121,7 @@ export const WorkspaceLoginSession = async (
 
     return await encodeSessionToken({
       ...decodedToken,
-      domain: {
+      workspace: {
         id: mgDomain.id,
         name: mgDomain.name,
         route: mgDomain.route,
@@ -135,8 +135,3 @@ export const WorkspaceLoginSession = async (
     throw new Error(error);
   }
 };
-
-export enum UserRole {
-  Admin = "admin",
-  User = "user",
-}

@@ -6,12 +6,12 @@ import { revalidatePath } from "next/cache";
 import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
 
-export const CreateChannel = async (channel: Channel, domainId: string) => {
+export const CreateChannel = async (channel: Channel, workspaceId: string) => {
   const { accessToken } = await validateOrGetToken("");
   try {
     const newChannel = await mgSdk.Channels.CreateChannel(
       channel,
-      domainId,
+      workspaceId,
       accessToken
     );
     return {
@@ -30,11 +30,11 @@ export const CreateChannel = async (channel: Channel, domainId: string) => {
 };
 
 export const ListChannels = async ({ queryParams }: RequestOptions) => {
-  const { accessToken, domainId } = await validateOrGetToken("");
+  const { accessToken, workspaceId } = await validateOrGetToken("");
   try {
     const channels = await mgSdk.Channels.Channels(
       queryParams,
-      domainId,
+      workspaceId,
       accessToken
     );
     return {
@@ -51,11 +51,11 @@ export const ListChannels = async ({ queryParams }: RequestOptions) => {
 };
 
 export const ViewChannel = async (id: string, listRoles?: boolean) => {
-  const { accessToken, domainId } = await validateOrGetToken("");
+  const { accessToken, workspaceId } = await validateOrGetToken("");
   try {
     const channel = await mgSdk.Channels.Channel(
       id,
-      domainId,
+      workspaceId,
       accessToken,
       listRoles
     );
@@ -75,13 +75,13 @@ export const ViewChannel = async (id: string, listRoles?: boolean) => {
 
 export const ListChannelMembers = async (
   { token = "", id = "", queryParams }: RequestOptions,
-  domainId: string
+  workspaceId: string
 ) => {
   try {
     const { accessToken } = await validateOrGetToken(token);
     const members = await mgSdk.Channels.ListChannelMembers(
       id,
-      domainId,
+      workspaceId,
       queryParams,
       accessToken
     );

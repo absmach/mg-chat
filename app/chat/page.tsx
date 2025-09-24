@@ -3,7 +3,7 @@ import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { ListWorkspaceUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
 import { Member } from "@/types/entities";
-import { GetDomainInvitations } from "@/lib/invitations";
+import { GetWorkspaceInvitations } from "@/lib/invitations";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { ListChannels } from "@/lib/channels";
 import { UserProfile } from "@/lib/users";
@@ -32,7 +32,7 @@ export default async function Page({ searchParams }: Props) {
   );
   const searchParamsValue = await searchParams;
   const status = searchParamsValue?.status || "pending";
-  const inviResponse = await GetDomainInvitations({
+  const inviResponse = await GetWorkspaceInvitations({
     offset: 0,
     limit: 100,
     state: status,

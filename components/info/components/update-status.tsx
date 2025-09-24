@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Status } from "@/types/entities";
 import { useState } from "react";
-import { DomainStatusDialog } from "./domain-satus";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { DisableWorkspace, EnableWorkspace } from "@/lib/workspace";

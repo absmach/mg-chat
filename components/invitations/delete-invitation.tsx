@@ -14,10 +14,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export function Delete({
-    domainId,
+    workspaceId,
     userId,
 }: {
-    domainId: string;
+    workspaceId: string;
     userId: string;
 }) {
     const [processing, setProcessing] = useState(false);
@@ -26,7 +26,7 @@ export function Delete({
         const toastId = toast("Sonner");
         toast.loading("Deleting invitation ...", { id: toastId });
 
-        const result = await DeleteInvitation({ domainId, userId });
+        const result = await DeleteInvitation({ workspaceId, userId });
         setProcessing(false);
         if (result.error === null) {
             toast.success("Invitation deleted successfully", {

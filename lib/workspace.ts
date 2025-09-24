@@ -47,14 +47,14 @@ export const ListWorkspaces = async ({ queryParams }: RequestOptions) => {
 };
 
 export const AddWorkspaceRoleMembers = async (
-  domainId: string,
+  workspaceId: string,
   roleId: string,
   members: string[],
 ) => {
   const { accessToken } = await validateOrGetToken("");
   try {
     const addedMembers = await mgSdk.Domains.AddDomainRoleMembers(
-      domainId,
+      workspaceId,
       roleId,
       members,
       accessToken,
@@ -108,10 +108,10 @@ export async function GetUserBasicInfo(userId: string, token = "") {
 }
 
 export const ListWorkspaceRoles = async ({ queryParams }: RequestOptions) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const rolesPage = await mgSdk.Domains.ListDomainRoles(
-      domainId,
+      workspaceId,
       queryParams,
       accessToken,
     );
@@ -179,18 +179,18 @@ export async function ProcessRoles(
 
 
 export const ListWorkspaceUsers = async (
-  domainId: string,
+  workspaceId: string,
   queryParams: RequestOptions["queryParams"],
 ) => {
   try {
     const { accessToken } = await validateOrGetToken("");
-    const domainMembers = await mgSdk.Domains.ListDomainMembers(
-      domainId,
+    const workspaceMembers = await mgSdk.Domains.ListDomainMembers(
+      workspaceId,
       queryParams,
       accessToken,
     );
     const processedMembers = await ProcessEntityMembers(
-      domainMembers,
+      workspaceMembers,
     );
     return {
       data: processedMembers,
@@ -308,10 +308,10 @@ export const UpdateWorkspace = async (workspace: Domain) => {
 
 export const GetWorkspaceInfo = async (listRoles?: boolean) => {
   try {
-    const { accessToken, domainId } = await validateOrGetToken("");
-    if (domainId !== "") {
+    const { accessToken, workspaceId } = await validateOrGetToken("");
+    if (workspaceId !== "") {
       const workspace = await mgSdk.Domains.Domain(
-        domainId,
+        workspaceId,
         accessToken,
         listRoles,
       );

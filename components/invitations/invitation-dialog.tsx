@@ -209,11 +209,11 @@ const InvitationManager = ({
                                                 ? invitation.invitee_user_id
                                                 : (invitation.invitee_user_id?.id as string)
                                         }
-                                        domainId={workspaceId}
+                                        workspaceId={workspaceId}
                                     />
                                 ) : (
                                     <Delete
-                                        domainId={
+                                        workspaceId={
                                             typeof invitation.domain_id === "string"
                                                 ? invitation.domain_id
                                                 : (invitation.domain_id?.id as string)

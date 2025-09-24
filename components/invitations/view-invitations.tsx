@@ -16,14 +16,14 @@ export function NotificationsBell({ invitations, isSidebar, className }: { invit
     const [processing, setProcessing] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState(false)
 
-    const handleAccept = async (domainId: string) => {
+    const handleAccept = async (workspaceId: string) => {
 
         setProcessing(true);
         const toastId = toast("Sonner");
         toast.loading("Accepting invitation ...", {
             id: toastId,
         });
-        const acceptResp = await AcceptInvitation(domainId)
+        const acceptResp = await AcceptInvitation(workspaceId)
         if (acceptResp.error === null) {
             toast.success("Invitation accepted successfully", {
                 id: toastId
@@ -35,13 +35,13 @@ export function NotificationsBell({ invitations, isSidebar, className }: { invit
         setProcessing(false);
     }
 
-    const handleDecline = async (domainId: string) => {
+    const handleDecline = async (workspaceId: string) => {
         setProcessing(true)
         const toastId = toast("Sonner");
         toast.loading("Accepting invitation ...", {
             id: toastId,
         });
-        const declResp = await DeclineInvitation(domainId)
+        const declResp = await DeclineInvitation(workspaceId)
         if (declResp !== null) {
             toast.error(`Failed to decline invitation with error: ${declResp.error}`, { id: toastId });
         } else {

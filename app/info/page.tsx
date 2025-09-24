@@ -13,16 +13,16 @@ export default async function Page() {
     if (workspaces.error !== null) {
         return <div>{workspaces.error}</div>;
     }
-    const domainResponse = await GetWorkspaceInfo(true);
+    const workspaceResponse = await GetWorkspaceInfo(true);
 
     return (
         <div className="h-screen flex bg-gray-100">
             <WorkspaceSwitcher
-                selectedWorkspaceId={session?.domain?.id as string}
+                selectedWorkspaceId={session?.workspace?.id as string}
                 workspaces={workspaces.data}
             />
             <InfoPage
-                domain={domainResponse?.data as Domain}
+                workspace={workspaceResponse?.data as Domain}
             />
         </div>
     );

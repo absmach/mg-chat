@@ -21,9 +21,9 @@ import {
     UpdateTagsDialog,
 } from "@/components/custom/entities/update";
 import { DisplayTags } from "@/components/custom/entities/view";
-import { UpdateDomain } from "@/lib/workspace";
+import { UpdateWorkspace } from "@/lib/workspace";
 import { cn, toSentenseCase } from "@/lib/utils";
-import { UpdateStatusDialog } from "./update-domain";
+import { UpdateStatusDialog } from "./update-status";
 import {
     EntityType,
     Status,
@@ -32,14 +32,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MoveLeft } from 'lucide-react';
 
-export default function DomainInfo({ workspace }: { workspace: Domain }) {
+export default function WorkspaceInfo({ workspace }: { workspace: Domain }) {
     const roles = workspace?.roles || [];
-    const isDomainAdmin = roles.some(
+    const isWorkspaceAdmin = roles.some(
         (role: MemberRoleActions) => role.role_name === "admin",
     );
     const status = workspace?.status;
 
-    const disabled = (!isDomainAdmin && status === Status.Disabled);
+    const disabled = (!isWorkspaceAdmin && status === Status.Disabled);
 
     return (
         <>
@@ -68,7 +68,7 @@ export default function DomainInfo({ workspace }: { workspace: Domain }) {
                             id={workspace?.id as string}
                             name={workspace?.name as string}
                             entity={EntityType.Workspace}
-                            updateName={UpdateDomain}
+                            updateName={UpdateWorkspace}
                             disabled={disabled}
                         />
                         <EntityIdRow id={workspace?.id as string} label={"id"} />
@@ -111,7 +111,7 @@ export default function DomainInfo({ workspace }: { workspace: Domain }) {
                                             id={workspace?.id as string}
                                             tags={workspace?.tags ? (workspace?.tags as string[]) : []}
                                             entity={EntityType.Workspace}
-                                            updateTags={UpdateDomain}
+                                            updateTags={UpdateWorkspace}
                                             disabled={disabled}
                                         />
                                     </div>
@@ -125,7 +125,7 @@ export default function DomainInfo({ workspace }: { workspace: Domain }) {
                                     metadata={workspace?.metadata || {}}
                                     id={workspace?.id as string}
                                     entity={EntityType.Workspace}
-                                    updateMetadata={UpdateDomain}
+                                    updateMetadata={UpdateWorkspace}
                                     disabled={disabled}
                                 />
                             </TableCell>

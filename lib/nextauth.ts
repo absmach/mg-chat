@@ -112,7 +112,7 @@ const authOptions: NextAuthOptions = {
       return {
         ...session,
         user: token.user,
-        domain: token.domain,
+        workspace: token.workspace,
         accessToken: token?.accessToken,
         accessTokenExpiry: token?.accessTokenExpiry,
         error: token.error,

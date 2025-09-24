@@ -53,7 +53,7 @@ invitationsPage: InvitationsPage
       <InvitationsDialog
         showInvitationDialog={showInvitationDialog}
         setShowInvitationDialog={setShowInvitationDialog}
-        invitations={invitationsPage.invitations}
+        invitations={invitationsPage?.invitations}
         workspaceId={workspaceId}
       />
     </>

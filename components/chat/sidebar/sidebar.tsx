@@ -188,7 +188,7 @@ export function Sidebar({
                 );
               })}
             </div>
-            <InviteMember domainId={workspaceId as string} />
+            <InviteMember workspaceId={workspaceId as string} />
           </div>
         </div>
       </ScrollArea>
