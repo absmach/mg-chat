@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Plus } from "lucide-react";
 import { CreateWorkspaceDialog } from "./create-workspace-dialog";
-import { DomainLogin } from "@/lib/actions";
+import { WorkspaceLogin } from "@/lib/actions";
 import { DomainsPage } from "@absmach/magistrala-sdk";
 
 interface Workspace {
@@ -48,7 +48,7 @@ export function WorkspaceSwitcher({ selectedWorkspaceId, workspaces }: Props) {
                     : "bg-gray-700 hover:bg-gray-600 hover:rounded-lg"
                 }`}
                 onClick={async () => {
-                  await DomainLogin(workspace.id as string);
+                  await WorkspaceLogin(workspace.id as string);
                 }}
                 title={workspace.name}
               >

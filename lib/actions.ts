@@ -1,14 +1,17 @@
 "use server";
 
-import { DomainLoginSession } from "@/lib/auth";
-import { getServerSession } from "@/lib/nextauth";
-import { generateUrl } from "@/lib/utils";
+import { WorkspaceLoginSession } from "@/lib/auth";
+import { decodeSessionToken, encodeSessionToken, getServerSession, getTokenExpiry } from "@/lib/nextauth";
+import { generateUrl, validateTime } from "@/lib/utils";
 import { EntityMembersPage, Member } from "@/types/entities";
-import { MemberRolesPage, PageMetadata } from "@absmach/magistrala-sdk";
+import { Domain, MemberRolesPage, PageMetadata } from "@absmach/magistrala-sdk";
 import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ViewUser } from "./users";
+import { UserProfile, ViewUser } from "./users";
+import { HttpError } from "@/types/errors";
+import { GetWorkspaceInfo } from "./workspace";
+import { UserInfo, UserRole } from "@/types/auth";
 
 export const absoluteUrl = async () => {
   const headersList = await headers();
@@ -34,7 +37,7 @@ export const absoluteUrl = async () => {
   };
 };
 
-export async function DomainLogin(workspaceId: string) {
+export async function WorkspaceLogin(workspaceId: string) {
   const cookiesStore = await cookies();
   const session = await getServerSession();
   const urlPath = await absoluteUrl();
@@ -62,7 +65,7 @@ export async function DomainLogin(workspaceId: string) {
     redirect(`${redirectPrefix}/auth?error=${session.error}`);
   }
 
-  if (session.domain?.id && session.domain.id === workspaceId) {
+  if (session.workspace?.id && session.workspace.id === workspaceId) {
     redirect(`${redirectPrefix}/chat`);
   }
 
@@ -75,19 +78,19 @@ export async function DomainLogin(workspaceId: string) {
     redirect(`${redirectPrefix}/auth?error=invalid_session}`);
   }
 
-  const domainSession = await DomainLoginSession(
+  const workspaceSession = await WorkspaceLoginSession(
     csrfTokenCookie.value,
     sessionTokenCookie.value,
     workspaceId
   );
 
-  if (!domainSession) {
+  if (!workspaceSession) {
     return;
   }
 
   cookiesStore.set({
     name: cookiesSessionKey,
-    value: domainSession,
+    value: workspaceSession,
     httpOnly: true,
     path: "/",
     secure: secure,
@@ -171,3 +174,89 @@ export async function ProcessEntityMembers(
     throw error;
   }
 }
+
+export const UpdateServerSession = async (): Promise<string | undefined> => {
+  try {
+    const cookiesStore = await cookies();
+    const headersList = await headers();
+
+    const proto = headersList.get("x-forwarded-proto");
+    const secure = proto === "https";
+
+    const cookiesSessionKey =
+      proto === "https"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token";
+    const cookiesCsrfKey =
+      proto === "https"
+        ? "__Host-next-auth.csrf-token"
+        : "next-auth.csrf-token";
+
+    const csrfTokenCookie = cookiesStore.get(cookiesCsrfKey);
+    const sessionTokenCookie = cookiesStore.get(cookiesSessionKey);
+    const decodedToken = await decodeSessionToken(
+      csrfTokenCookie?.value as string,
+      sessionTokenCookie?.value as string,
+    );
+    if (!decodedToken) {
+      return;
+    }
+
+    const userResponse = await UserProfile(decodedToken.accessToken as string);
+    if (userResponse.error !== null) {
+      return;
+    }
+    const user = userResponse.data;
+
+    const workspaceResponse = await GetWorkspaceInfo(true);
+    if (workspaceResponse.error !== null) {
+      return;
+    }
+    const workspace = workspaceResponse.data;
+
+    const allowUnverifiedUser =
+      process.env.MG_UI_ALLOW_UNVERIFIED_USER === "true";
+
+    const updatedSession = await encodeSessionToken({
+      ...decodedToken,
+      user: {
+        id: user.id as string,
+        username: user.credentials?.username as string,
+        // biome-ignore lint/style/useNamingConvention: This is from an external library
+        first_name: user.first_name as string,
+        // biome-ignore lint/style/useNamingConvention: This is from an external library
+        last_name: user.last_name as string,
+        email: user.email as string,
+        image: user.profile_picture,
+        role: user.role,
+        verified:
+          allowUnverifiedUser ||
+          validateTime(user.verified_at) ||
+          user.role === UserRole.Admin,
+      } as UserInfo,
+      workspace: {
+        id: workspace.id,
+        name: workspace.name,
+        route: workspace.route,
+        roles: workspace.roles,
+      } as Domain,
+      accessToken: decodedToken.accessToken,
+      refreshToken: decodedToken.refreshToken,
+      refreshTokenExpiry: getTokenExpiry(decodedToken.refreshToken as string),
+      accessTokenExpiry: getTokenExpiry(decodedToken.accessToken as string),
+    });
+
+    cookiesStore.set({
+      name: cookiesSessionKey,
+      value: updatedSession,
+      httpOnly: true,
+      path: "/",
+      secure: secure,
+    });
+  } catch (err) {
+    const knownError = err as HttpError;
+    const error =
+      knownError.error || knownError.message || knownError.toString();
+    throw new Error(error);
+  }
+};

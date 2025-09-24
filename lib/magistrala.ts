@@ -35,8 +35,8 @@ export const validateOrGetToken = async (
   }
   const session = await getServerSession();
   if (session && session.accessToken !== "") {
-    if (session.domain?.id) {
-      return { accessToken: session.accessToken, domainId: session.domain.id };
+    if (session.workspace?.id) {
+      return { accessToken: session.accessToken, domainId: session.workspace.id };
     }
     return { accessToken: session.accessToken, domainId: "" };
   }

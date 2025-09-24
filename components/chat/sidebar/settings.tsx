@@ -8,10 +8,10 @@ import { SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
 export function Settings({
-domainId,
+workspaceId,
 invitationsPage,
 }:{
-domainId: string;
+workspaceId: string;
 invitationsPage: InvitationsPage
 }) {
   const [showInvitationDialog, setShowInvitationDialog] = useState(false);
@@ -46,7 +46,7 @@ invitationsPage: InvitationsPage
         showInvitationDialog={showInvitationDialog}
         setShowInvitationDialog={setShowInvitationDialog}
         invitations={invitationsPage.invitations}
-        domainId={domainId}
+        workspaceId={workspaceId}
       />
     </>
   );

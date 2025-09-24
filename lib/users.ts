@@ -3,6 +3,7 @@
 import { PageMetadata, User } from "@absmach/magistrala-sdk";
 import { mgSdk, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
+import { revalidatePath } from "next/cache";
 
 export const CreateUser = async (user: User) => {
   try {
@@ -86,5 +87,64 @@ export const SearchUsers = async (queryParams: PageMetadata) => {
       data: null,
       error: knownError.error || knownError.message || knownError.toString(),
     };
+  }
+};
+
+export const UpdateUserEmail = async (user: User) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    const updated = await mgSdk.Users.UpdateEmail(user, accessToken);
+    return {
+      data: updated.credentials?.username as string,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/chat");
+  }
+};
+
+export const UpdateUsername = async (user: User) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    const updated = await mgSdk.Users.UpdateUsername(user, accessToken);
+    return {
+      data: updated.credentials?.username as string,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/chat");
+  }
+};
+
+export const UpdateUserPassword = async (
+  oldSecret: string,
+  newSecret: string,
+) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    await mgSdk.Users.UpdateUserPassword(oldSecret, newSecret, accessToken);
+    return {
+      data: "Password Updated Successfully",
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      error: knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/chat");
   }
 };

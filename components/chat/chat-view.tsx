@@ -17,7 +17,7 @@ interface Props {
   selectedDM: string | null;
   setSelectedChannel: (channel: string | null) => void;
   session: Session;
-  domainId: string;
+  workspaceId: string;
   dmChannelId: string;
 }
 
@@ -26,7 +26,7 @@ export function ChatView({
   setSelectedChannel,
   selectedDM,
   session,
-  domainId,
+  workspaceId,
   dmChannelId,
 }: Props) {
   const [userId, setUserId] = useState(session?.user?.id);
@@ -37,7 +37,7 @@ export function ChatView({
 
   const dmTopic = getDMTopic(userId as string, selectedDM as string);
   const { messages, setMessages, sendMessage, connect, setActiveTopic } = useWebSocket();
-  const { domain } = session;
+  const { workspace } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Client[]>([]);
@@ -92,16 +92,16 @@ export function ChatView({
       if (userProfile.data !== null) {
         setUserId(userProfile.data.id as string);
         connect(
-          domain?.id as string,
+          workspace?.id as string,
           selectedChannel as string,
         );
       }
     };
-    if (selectedChannel && domain?.id) {
+    if (selectedChannel && workspace?.id) {
       connectSocket();
     }
 
-  }, [domain, selectedChannel, connect]);
+  }, [workspace, selectedChannel, connect]);
 
   useEffect(() => {
     const getData = async () => {
@@ -132,7 +132,7 @@ export function ChatView({
     };
 
     getData();
-  }, [selectedDM]);
+  }, [selectedDM, session]);
 
   const handleSend = (input: string) => {
     if (input.trim()) {
@@ -173,14 +173,14 @@ export function ChatView({
             limit: 100,
           },
         },
-        domainId as string
+        workspaceId as string
       );
       if (response.data) {
         setMembers(response.data.members);
       }
     };
     getMembers();
-  }, [selectedChannel, domainId]);
+  }, [selectedChannel, workspaceId]);
 
   if (!selectedChannel && !selectedDM) {
     return (

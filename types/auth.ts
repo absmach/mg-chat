@@ -24,14 +24,14 @@ export interface Tokens extends AccessToken, RefreshToken {}
 
 export interface Session extends AccessToken {
   user: UserInfo;
-  domain?: Domain;
+  workspace?: Domain;
   error?: string;
   expires: string;
 }
 
 export interface User extends Tokens {
   user: UserInfo;
-  domain?: Domain;
+  workspace?: Domain;
   error?: string;
 }
 
