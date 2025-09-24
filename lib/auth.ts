@@ -97,7 +97,7 @@ export const RefreshToken = (refreshToken: string): Promise<Token> => {
   });
 };
 
-export const DomainLoginSession = async (
+export const WorkspaceLoginSession = async (
   csrfToken: string,
   sessionToken: string,
   domainId: string,

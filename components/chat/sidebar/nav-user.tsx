@@ -349,7 +349,7 @@ export function NavUser({ user }: Props) {
               <div className="flex items-center space-x-3">
                 <UserIcon className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-sm text-gray-300">User names</p>
+                  <p className="text-sm text-gray-300">Full Name</p>
                   <p className="text-sm text-blue-400">{user?.first_name} {""} {user?.last_name}</p>
                 </div>
               </div>

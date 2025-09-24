@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Domain } from "@absmach/magistrala-sdk";
 import { Button } from "@/components/ui/button";
-import { DomainLogin } from "@/lib/actions";
+import { WorkspaceLogin } from "@/lib/actions";
 
 interface Props {
   workspace: Domain;
@@ -36,7 +36,7 @@ export function WorkspaceCard({ workspace }: Props) {
             size="sm"
             className="cursor-pointer"
             onClick={async () => {
-              await DomainLogin(workspace.id as string);
+              await WorkspaceLogin(workspace.id as string);
             }}
           >
             Open

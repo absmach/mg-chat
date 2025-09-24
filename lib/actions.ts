@@ -1,6 +1,6 @@
 "use server";
 
-import { DomainLoginSession } from "@/lib/auth";
+import { WorkspaceLoginSession } from "@/lib/auth";
 import { decodeSessionToken, encodeSessionToken, getServerSession, getTokenExpiry } from "@/lib/nextauth";
 import { generateUrl, validateTime } from "@/lib/utils";
 import { EntityMembersPage, Member } from "@/types/entities";
@@ -37,7 +37,7 @@ export const absoluteUrl = async () => {
   };
 };
 
-export async function DomainLogin(workspaceId: string) {
+export async function WorkspaceLogin(workspaceId: string) {
   const cookiesStore = await cookies();
   const session = await getServerSession();
   const urlPath = await absoluteUrl();
@@ -78,7 +78,7 @@ export async function DomainLogin(workspaceId: string) {
     redirect(`${redirectPrefix}/auth?error=invalid_session}`);
   }
 
-  const domainSession = await DomainLoginSession(
+  const domainSession = await WorkspaceLoginSession(
     csrfTokenCookie.value,
     sessionTokenCookie.value,
     workspaceId
@@ -208,11 +208,11 @@ export const UpdateServerSession = async (): Promise<string | undefined> => {
     }
     const user = userResponse.data;
 
-    const domainResponse = await GetWorkspaceInfo(true);
-    if (domainResponse.error !== null) {
+    const workspaceResponse = await GetWorkspaceInfo(true);
+    if (workspaceResponse.error !== null) {
       return;
     }
-    const domain = domainResponse.data;
+    const workspace = workspaceResponse.data;
 
     const allowUnverifiedUser =
       process.env.MG_UI_ALLOW_UNVERIFIED_USER === "true";
@@ -234,11 +234,11 @@ export const UpdateServerSession = async (): Promise<string | undefined> => {
           validateTime(user.verified_at) ||
           user.role === UserRole.Admin,
       } as UserInfo,
-      domain: {
-        id: domain.id,
-        name: domain.name,
-        route: domain.route,
-        roles: domain.roles,
+      workspace: {
+        id: workspace.id,
+        name: workspace.name,
+        route: workspace.route,
+        roles: workspace.roles,
       } as Domain,
       accessToken: decodedToken.accessToken,
       refreshToken: decodedToken.refreshToken,
