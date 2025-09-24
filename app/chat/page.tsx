@@ -23,8 +23,8 @@ export default async function Page({ searchParams }: Props) {
   if (workspaces.error !== null) {
     return <div>{workspaces.error}</div>;
   }
-  const domainId = session?.domain?.id as string;
-  const memResponse = await ListDomainUsers(domainId,
+  const workspaceId = session?.workspace?.id as string;
+  const memResponse = await ListDomainUsers(workspaceId,
     {
       offset: 0,
       limit: 100,
@@ -46,7 +46,7 @@ export default async function Page({ searchParams }: Props) {
   return (
     <div className="h-screen flex bg-gray-100">
       <WorkspaceSwitcher
-        selectedWorkspaceId={session?.domain?.id as string}
+        selectedWorkspaceId={session?.workspace?.id as string}
         workspaces={workspaces.data}
       />
       <ChatPage

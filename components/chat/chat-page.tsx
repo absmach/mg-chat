@@ -17,7 +17,7 @@ interface Props {
 export default function ChatPage({ session, members, invitationsPage, dmChannelId, user }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(session?.user?.id as string);
-  const domainId = session.domain?.id;
+  const workspaceId = session.workspace
   return (
     <>
       <div
@@ -45,7 +45,7 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
           setSelectedChannel={setSelectedChannel}
           selectedDM={selectedDM}
           session={session}
-          domainId={domainId as string}
+          workspaceId={workspaceId as string}
           dmChannelId={dmChannelId as string} 
         />
       </div>

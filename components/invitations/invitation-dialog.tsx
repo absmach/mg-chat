@@ -27,12 +27,12 @@ export const InvitationsDialog = ({
     showInvitationDialog,
     setShowInvitationDialog,
     invitations,
-    domainId,
+    workspaceId,
 }: {
     showInvitationDialog: boolean;
     setShowInvitationDialog: Dispatch<SetStateAction<boolean>>;
     invitations: Invitation[];
-    domainId: string;
+    workspaceId: string;
 }) => {
     return (
         <Dialog open={showInvitationDialog} onOpenChange={setShowInvitationDialog}>
@@ -44,7 +44,7 @@ export const InvitationsDialog = ({
                     </DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
-                <InvitationManager domainId={domainId} invitations={invitations} />
+                <InvitationManager workspaceId={workspaceId} invitations={invitations} />
             </DialogContent>
         </Dialog>
     );
@@ -52,12 +52,12 @@ export const InvitationsDialog = ({
 
 interface InvitationManagerProps {
     invitations: Invitation[];
-    domainId: string;
+    workspaceId: string;
 }
 
 const InvitationManager = ({
     invitations,
-    domainId,
+    workspaceId,
 }: InvitationManagerProps) => {
     const isValidDate = (date?: Date): boolean => {
         if (!date) return false;
@@ -180,7 +180,7 @@ const InvitationManager = ({
                                         {formatDate(invitation.created_at)}
                                     </p>
                                 </div>
-                                {(invitation.confirmed_at && status === "accepted")&& (
+                                {(invitation.confirmed_at && status === "accepted") && (
                                     <div>
                                         <span className="text-muted-foreground">Confirmed:</span>
                                         <p className="font-medium">
@@ -209,7 +209,7 @@ const InvitationManager = ({
                                                 ? invitation.invitee_user_id
                                                 : (invitation.invitee_user_id?.id as string)
                                         }
-                                        domainId={domainId}
+                                        domainId={workspaceId}
                                     />
                                 ) : (
                                     <Delete

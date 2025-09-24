@@ -65,7 +65,7 @@ export async function WorkspaceLogin(workspaceId: string) {
     redirect(`${redirectPrefix}/auth?error=${session.error}`);
   }
 
-  if (session.domain?.id && session.domain.id === workspaceId) {
+  if (session.workspace?.id && session.workspace.id === workspaceId) {
     redirect(`${redirectPrefix}/chat`);
   }
 
@@ -78,19 +78,19 @@ export async function WorkspaceLogin(workspaceId: string) {
     redirect(`${redirectPrefix}/auth?error=invalid_session}`);
   }
 
-  const domainSession = await WorkspaceLoginSession(
+  const workspaceSession = await WorkspaceLoginSession(
     csrfTokenCookie.value,
     sessionTokenCookie.value,
     workspaceId
   );
 
-  if (!domainSession) {
+  if (!workspaceSession) {
     return;
   }
 
   cookiesStore.set({
     name: cookiesSessionKey,
-    value: domainSession,
+    value: workspaceSession,
     httpOnly: true,
     path: "/",
     secure: secure,

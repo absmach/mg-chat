@@ -42,7 +42,7 @@ export function Sidebar({
   const [revalidate, setRevalidate] = useState(false);
   const [directMessages, setDirectMessages] = useState<string | null>(null);
 
-  const workspaceId = session.domain?.id;
+  const workspaceId = session.workspace?.id;
 
   const getData = useCallback(async () => {
     const groupResponse = await ListChannels({
@@ -81,7 +81,7 @@ export function Sidebar({
     window.location.href = "/";
   };
 
-  const domain = session.domain;
+  const workspace = session.workspace;
 
   return (
     <div className="h-full flex flex-col bg-gray-800 text-white">
@@ -94,17 +94,17 @@ export function Sidebar({
           <Avatar>
             <AvatarImage src={"/placeholder.svg"} />
             <AvatarFallback className=" text-black">
-              {domain?.name?.charAt(0) || "U"}
+              {workspace?.name?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0 text-left">
             <p className="font-semibold text-white truncate">
-              {domain?.name || "Loading..."}
+              {workspace?.name || "Loading..."}
             </p>
-            <p className="text-xs text-gray-300 truncate">{domain?.route}</p>
+            <p className="text-xs text-gray-300 truncate">{workspace?.route}</p>
           </div> 
         </Button>
-        <Settings domainId={domain?.id as string} invitationsPage={invitationsPage} />
+        <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} />
 
       </div>
 
@@ -115,7 +115,7 @@ export function Sidebar({
               <span className="text-sm font-medium text-gray-300">
                 Channels
               </span>
-              <CreateChannelDialog setRevalidate={setRevalidate} domainId={domain?.id as string}/>
+              <CreateChannelDialog setRevalidate={setRevalidate} workspaceId={workspace?.id as string}/>
             </div>
 
             <div className="space-y-1">
