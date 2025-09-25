@@ -1,5 +1,4 @@
 import { getServerSession } from "@/lib/nextauth";
-import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { ListWorkspaceUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
 import { Member } from "@/types/entities";
@@ -44,11 +43,6 @@ export default async function Page({ searchParams }: Props) {
   const user = await UserProfile(session.accessToken);
 
   return (
-    <div className="h-screen flex bg-gray-100">
-      <WorkspaceSwitcher
-        selectedWorkspaceId={session?.workspace?.id as string}
-        workspaces={workspaces.data}
-      />
       <ChatPage
         session={session}
         members={memResponse.data?.members as Member[]}
@@ -56,6 +50,5 @@ export default async function Page({ searchParams }: Props) {
         dmChannelId={dmChannelId as string} 
         user={user.data as User}
         />
-    </div>
   );
 }

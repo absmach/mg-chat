@@ -1,10 +1,13 @@
-import { getServerSession } from "@/lib/nextauth";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
-import { GetWorkspaceInfo, ListWorkspaces } from "@/lib/workspace";
-import { Domain } from "@absmach/magistrala-sdk";
-import InfoPage from "@/components/info/info-page";
+import { getServerSession } from "@/lib/nextauth";
+import { ListWorkspaces } from "@/lib/workspace";
+import { ReactNode } from "react";
 
-export default async function Page() {
+interface Props {
+    children: ReactNode;
+}
+
+export default async function Layout({ children }: Props) {
     const session = await getServerSession();
     const workspaces = await ListWorkspaces({
         queryParams: { limit: 100, offset: 0 },
@@ -13,7 +16,6 @@ export default async function Page() {
     if (workspaces.error !== null) {
         return <div>{workspaces.error}</div>;
     }
-    const workspaceResponse = await GetWorkspaceInfo(true);
 
     return (
         <div className="h-screen flex bg-gray-100">
@@ -21,9 +23,7 @@ export default async function Page() {
                 selectedWorkspaceId={session?.workspace?.id as string}
                 workspaces={workspaces.data}
             />
-            <InfoPage
-                workspace={workspaceResponse?.data as Domain}
-            />
+            <>{children}</>
         </div>
     );
 }
