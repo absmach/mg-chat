@@ -29,16 +29,16 @@ export interface RequestOptions {
 
 export const validateOrGetToken = async (
   token: string
-): Promise<{ accessToken: string; domainId: string }> => {
+): Promise<{ accessToken: string; workspaceId: string }> => {
   if (token) {
-    return { accessToken: token, domainId: "" };
+    return { accessToken: token, workspaceId: "" };
   }
   const session = await getServerSession();
   if (session && session.accessToken !== "") {
     if (session.workspace?.id) {
-      return { accessToken: session.accessToken, domainId: session.workspace.id };
+      return { accessToken: session.accessToken, workspaceId: session.workspace.id };
     }
-    return { accessToken: session.accessToken, domainId: "" };
+    return { accessToken: session.accessToken, workspaceId: "" };
   }
-  return { accessToken: "", domainId: "" };
+  return { accessToken: "", workspaceId: "" };
 };

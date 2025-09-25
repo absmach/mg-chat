@@ -15,9 +15,9 @@ export const GetMessages = async ({
   queryParams,
 }: MessagesRequestOptions) => {
   try {
-    const { accessToken, domainId } = await validateOrGetToken("");
+    const { accessToken, workspaceId} = await validateOrGetToken("");
     const messagesPage = await mgSdk.Messages.Read(
-      domainId,
+      workspaceId,
       id,
       queryParams,
       accessToken,
@@ -72,10 +72,10 @@ async function processMessages(
 
 async function GetClientBasicInfo(clientId: string, token = "") {
   try {
-    const { accessToken, domainId } = await validateOrGetToken(token);
+    const { accessToken, workspaceId} = await validateOrGetToken(token);
     const clientInfo = await mgSdk.Clients.Client(
       clientId,
-      domainId,
+      workspaceId,
       accessToken,
     );
     return {

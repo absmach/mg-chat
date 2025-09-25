@@ -29,10 +29,10 @@ export const CreateWorkspace = async (workspace: Domain) => {
 export const ListWorkspaces = async ({ queryParams }: RequestOptions) => {
   try {
     const { accessToken } = await validateOrGetToken("");
-    const domainsPage = await mgSdk.Domains.Domains(queryParams, accessToken);
+    const workspacePage = await mgSdk.Domains.Domains(queryParams, accessToken);
 
     return {
-      data: domainsPage,
+      data: workspacePage,
       error: null,
     };
   } catch (err: unknown) {
@@ -46,15 +46,15 @@ export const ListWorkspaces = async ({ queryParams }: RequestOptions) => {
   }
 };
 
-export const AddDomainRoleMembers = async (
-  domainId: string,
+export const AddWorkspaceRoleMembers = async (
+  workspaceId: string,
   roleId: string,
   members: string[],
 ) => {
   const { accessToken } = await validateOrGetToken("");
   try {
     const addedMembers = await mgSdk.Domains.AddDomainRoleMembers(
-      domainId,
+      workspaceId,
       roleId,
       members,
       accessToken,
@@ -74,17 +74,17 @@ export const AddDomainRoleMembers = async (
   }
 };
 
-export const GetDomainBasicInfo = async (domainId: string) => {
+export const GetWorkspaceBasicInfo = async (workspaceId: string) => {
   try {
     const { accessToken } = await validateOrGetToken("");
-    const domain = await mgSdk.Domains.Domain(domainId, accessToken);
+    const workspace = await mgSdk.Domains.Domain(workspaceId, accessToken);
     return {
-      id: domain.id,
-      name: domain.name,
-      route: domain.route,
+      id: workspace.id,
+      name: workspace.name,
+      route: workspace.route,
     } as DomainBasicInfo;
   } catch (_error) {
-    return domainId;
+    return workspaceId;
   }
 };
 
@@ -107,11 +107,11 @@ export async function GetUserBasicInfo(userId: string, token = "") {
   }
 }
 
-export const ListDomainRoles = async ({ queryParams }: RequestOptions) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+export const ListWorkspaceRoles = async ({ queryParams }: RequestOptions) => {
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const rolesPage = await mgSdk.Domains.ListDomainRoles(
-      domainId,
+      workspaceId,
       queryParams,
       accessToken,
     );
@@ -178,19 +178,19 @@ export async function ProcessRoles(
 }
 
 
-export const ListDomainUsers = async (
-  domainId: string,
+export const ListWorkspaceUsers = async (
+  workspaceId: string,
   queryParams: RequestOptions["queryParams"],
 ) => {
   try {
     const { accessToken } = await validateOrGetToken("");
-    const domainMembers = await mgSdk.Domains.ListDomainMembers(
-      domainId,
+    const workspaceMembers = await mgSdk.Domains.ListDomainMembers(
+      workspaceId,
       queryParams,
       accessToken,
     );
     const processedMembers = await ProcessEntityMembers(
-      domainMembers,
+      workspaceMembers,
     );
     return {
       data: processedMembers,
@@ -249,12 +249,69 @@ export async function ProcessEntityMembers(
   }
 }
 
+export const EnableWorkspace = async (id: string) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    await mgSdk.Domains.EnableDomain(id, accessToken);
+    return {
+      data: "Workspace enabled",
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/info");
+  }
+};
+
+export const DisableWorkspace = async (id: string) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    await mgSdk.Domains.DisableDomain(id, accessToken);
+    return {
+      data: "Workspace disabled",
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/info");
+  }
+};
+
+export const UpdateWorkspace = async (workspace: Domain) => {
+  try {
+    const { accessToken } = await validateOrGetToken("");
+    const updated = await mgSdk.Domains.UpdateDomain(workspace, accessToken);
+    return {
+      data: updated.name as string,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/info");
+  }
+};
+
 export const GetWorkspaceInfo = async (listRoles?: boolean) => {
   try {
-    const { accessToken, domainId } = await validateOrGetToken("");
-    if (domainId !== "") {
+    const { accessToken, workspaceId } = await validateOrGetToken("");
+    if (workspaceId !== "") {
       const workspace = await mgSdk.Domains.Domain(
-        domainId,
+        workspaceId,
         accessToken,
         listRoles,
       );

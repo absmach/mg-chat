@@ -10,10 +10,12 @@ import { Session } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
-import { Channel, InvitationsPage, User } from "@absmach/magistrala-sdk";
+import { Channel, Invitation, InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { Member } from "@/types/entities";
 import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
+import { NotificationsBell } from "@/components/invitations/view-invitations";
+import { GetUserInvitations } from "@/lib/invitations";
 
 interface Props {
   session: Session;
@@ -41,6 +43,7 @@ export function Sidebar({
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
   const [directMessages, setDirectMessages] = useState<string | null>(null);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
 
   const workspaceId = session.workspace?.id;
 
@@ -64,11 +67,27 @@ export function Sidebar({
     }
   }, []);
 
+  const getInvitations = useCallback(async () => {
+    const invitationResponse = await GetUserInvitations({
+      offset: 0,
+      limit: 20,
+      state: "pending",
+      // biome-ignore lint/style/useNamingConvention: This is from an external library
+      invitee_user_id: session?.user?.id,
+    });
+    if (invitationResponse.data) {
+      setInvitations(invitationResponse.data.invitations);
+    } else {
+      setInvitations([]);
+    }
+  }, [session?.user.id]);
+
   useEffect(() => {
     if (workspaceId) {
       getData();
+      getInvitations()
     }
-  }, [workspaceId, getData]);
+  }, [workspaceId, getData, getInvitations]);
 
   useEffect(() => {
     if (revalidate) {
@@ -88,11 +107,10 @@ export function Sidebar({
       <div className="p-4 border-b flex items-center justify-between border-gray-700">
         <Button
           variant="ghost"
-          className="cursor-pointer w-8/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center"
+          className="cursor-pointer w-7/10 justify-start p-2 h-auto text-white hover:bg-gray-700 items-center"
           onClick={handleSwitchWorkspace}
         >
           <Avatar>
-            <AvatarImage src={"/placeholder.svg"} />
             <AvatarFallback className=" text-black">
               {workspace?.name?.charAt(0) || "U"}
             </AvatarFallback>
@@ -105,7 +123,7 @@ export function Sidebar({
           </div> 
         </Button>
         <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} />
-
+        <NotificationsBell invitations={invitations} isSidebar={true} className="mt-4 ml-4"/>
       </div>
 
       <ScrollArea className="flex-1">
@@ -188,7 +206,7 @@ export function Sidebar({
                 );
               })}
             </div>
-            <InviteMember domainId={workspaceId as string} />
+            <InviteMember workspaceId={workspaceId as string} />
           </div>
         </div>
       </ScrollArea>

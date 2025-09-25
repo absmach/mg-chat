@@ -9,20 +9,21 @@ import { Bell, Check, X, Users, BellOff } from "lucide-react"
 import { Invitation } from "@absmach/magistrala-sdk"
 import { AcceptInvitation, DeclineInvitation } from "@/lib/invitations"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 
-export function NotificationsBell({ invitations }: { invitations: Invitation[] }) {
+export function NotificationsBell({ invitations, isSidebar, className }: { invitations: Invitation[], isSidebar?: boolean, className?: string }) {
     const [processing, setProcessing] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState(false)
 
-    const handleAccept = async (domainId: string) => {
+    const handleAccept = async (workspaceId: string) => {
 
         setProcessing(true);
         const toastId = toast("Sonner");
         toast.loading("Accepting invitation ...", {
             id: toastId,
         });
-        const acceptResp = await AcceptInvitation(domainId)
+        const acceptResp = await AcceptInvitation(workspaceId)
         if (acceptResp.error === null) {
             toast.success("Invitation accepted successfully", {
                 id: toastId
@@ -34,13 +35,13 @@ export function NotificationsBell({ invitations }: { invitations: Invitation[] }
         setProcessing(false);
     }
 
-    const handleDecline = async (domainId: string) => {
+    const handleDecline = async (workspaceId: string) => {
         setProcessing(true)
         const toastId = toast("Sonner");
         toast.loading("Accepting invitation ...", {
             id: toastId,
         });
-        const declResp = await DeclineInvitation(domainId)
+        const declResp = await DeclineInvitation(workspaceId)
         if (declResp !== null) {
             toast.error(`Failed to decline invitation with error: ${declResp.error}`, { id: toastId });
         } else {
@@ -65,7 +66,7 @@ export function NotificationsBell({ invitations }: { invitations: Invitation[] }
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-80 p-0 min-w-48" align="end">
+            <PopoverContent className={cn("w-80 p-0 min-w-48", className)} align="end" side={isSidebar ? "right" : "bottom"} sideOffset={4}>
                 <div className="border-b border-border p-4">
                     <div className="flex items-center gap-2">
                         <Bell className="h-5 w-5" />

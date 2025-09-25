@@ -18,11 +18,11 @@ import { toast } from "sonner";
 export function ResendInvitation({
     roleId,
     userId,
-    domainId,
+    workspaceId,
 }: {
     roleId: string;
     userId: string;
-    domainId: string;
+    workspaceId: string;
 }) {
     const [processing, setProcessing] = useState(false);
     const [user, setUser] = useState<UserBasicInfo | null>(null);
@@ -42,7 +42,7 @@ export function ResendInvitation({
             id: toastId,
         });
 
-        const result = await SendInvitation(userId, roleId, domainId, true);
+        const result = await SendInvitation(userId, roleId, workspaceId, true);
         setProcessing(false);
         if (result.error === null) {
             toast.success(

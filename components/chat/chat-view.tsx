@@ -58,6 +58,7 @@ export function ChatView({
         });
 
         if (response.data) {
+          setIsLoading(false)
           setMessages(response.data.messages);
         }
         return;
@@ -107,14 +108,7 @@ export function ChatView({
     const getData = async () => {
       const response = await ViewChannel(selectedChannel || "");
       if (response.data) {
-        if (!selectedChannel) {
-          const chan = (response.data as ChannelsPage).channels?.[0];
-
-          setSelectedChannel(chan?.id as string);
-          setChannelInfo(chan);
-        } else {
-          setChannelInfo(response.data);
-        }
+        setChannelInfo(response.data);
       } else {
         setSelectedChannel(selectedChannel);
       }
@@ -232,13 +226,7 @@ export function ChatView({
       </div>
 
       <div className="flex-1 flex flex-col">
-        {isLoading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          </div>
-        ) : (
-          <MessageList messages={messages} userId={userId as string} />
-        )}
+        <MessageList messages={messages} userId={userId as string} />
 
         <div className="border p-6 m-4 rounded-md">
           <MessageInput onSendMessage={handleSend} />

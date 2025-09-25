@@ -3,20 +3,20 @@
 import { HttpError } from "@/types/errors";
 import { mgSdk, validateOrGetToken } from "./magistrala";
 import { revalidatePath } from "next/cache";
-import { GetDomainBasicInfo, GetUserBasicInfo } from "./workspace";
+import { GetWorkspaceBasicInfo, GetUserBasicInfo } from "./workspace";
 import { DomainBasicInfo, Invitation, InvitationPageMeta, InvitationsPage, UserBasicInfo } from "@absmach/magistrala-sdk";
 
 export const SendInvitation = async (
   userId: string,
   roleId: string,
-  domainId: string,
+  workspaceId: string,
   resend?: boolean,
 ) => {
   try {
     const { accessToken } = await validateOrGetToken("");
     await mgSdk.Domains.SendInvitation(
       userId,
-      domainId,
+      workspaceId,
       roleId,
       accessToken,
       resend,
@@ -38,15 +38,15 @@ export const SendInvitation = async (
   }
 };
 
-export const InviteMultipleUsersToDomain = async (
+export const InviteMultipleUsersToWorkspace = async (
   userIds: string[],
   roleId: string,
-  domainId: string,
+  workspaceId: string,
 ) => {
   const { accessToken } = await validateOrGetToken("");
 
   const results = await Promise.all(
-    userIds.map((userId) => SendInvitation(userId, roleId, domainId)),
+    userIds.map((userId) => SendInvitation(userId, roleId, workspaceId)),
   );
 
   const errors = results
@@ -62,25 +62,25 @@ export const InviteMultipleUsersToDomain = async (
     }),
   );
 
-  const domainInfo = await GetDomainBasicInfo(domainId);
-  const domainName =
-    typeof domainInfo === "string" ? domainInfo : domainInfo.name;
+  const workspaceInfo = await GetWorkspaceBasicInfo(workspaceId);
+  const workspaceName =
+    typeof workspaceInfo === "string" ? workspaceInfo : workspaceInfo.name;
 
   return {
     results,
     errors,
     metadata: {
       usernames,
-      domainName,
+      workspaceName,
       roleId,
     },
   };
 };
 
-export const AcceptInvitation = async (domainId: string) => {
+export const AcceptInvitation = async (workspaceId: string) => {
   const { accessToken } = await validateOrGetToken("");
   try {
-    await mgSdk.Domains.AcceptInvitation(domainId, accessToken);
+    await mgSdk.Domains.AcceptInvitation(workspaceId, accessToken);
     return {
       data: "Invitation Accepted Successfully",
       error: null,
@@ -96,10 +96,10 @@ export const AcceptInvitation = async (domainId: string) => {
   }
 };
 
-export const DeclineInvitation = async (domainId: string) => {
+export const DeclineInvitation = async (workspaceId: string) => {
   const { accessToken } = await validateOrGetToken("");
   try {
-    await mgSdk.Domains.RejectInvitation(domainId, accessToken);
+    await mgSdk.Domains.RejectInvitation(workspaceId, accessToken);
     return {
       data: "Inviatation Declined Successfully",
       error: null,
@@ -116,15 +116,15 @@ export const DeclineInvitation = async (domainId: string) => {
 };
 
 export const DeleteInvitation = async ({
-  domainId,
+  workspaceId,
   userId
 }: {
-  domainId: string;
+  workspaceId: string;
   userId: string;
 }) => {
   const { accessToken } = await validateOrGetToken("");
   try {
-    await mgSdk.Domains.DeleteInvitation(userId, domainId, accessToken);
+    await mgSdk.Domains.DeleteInvitation(userId, workspaceId, accessToken);
     return {
       data: "Inviatation Deleted Successfully",
       error: null,
@@ -147,17 +147,7 @@ export const GetUserInvitations = async (queryParams: InvitationPageMeta) => {
       queryParams,
       accessToken,
     );
-    const invitations = await processInvitations(
-      invitationsPage.invitations,
-      accessToken,
-    );
     return {
-    //   data: {
-    //     total: invitationsPage.total,
-    //     offset: invitationsPage.offset,
-    //     limit: invitationsPage.limit,
-    //     invitations,
-    //   } as InvitationsPage,
       data: invitationsPage,
       error: null,
     };
@@ -192,11 +182,11 @@ async function processInvitations(
               : await GetUserBasicInfo(invitation.invitee_user_id, token)
             : (invitation.invitee_user_id as UserBasicInfo);
 
-        const domainId: DomainBasicInfo | string =
+        const workspaceId: DomainBasicInfo | string =
           typeof invitation.domain_id === "string"
             ? invitation.domain_id === ""
               ? invitation.domain_id
-              : await GetDomainBasicInfo(invitation.domain_id)
+              : await GetWorkspaceBasicInfo(invitation.domain_id)
             : (invitation.domain_id as DomainBasicInfo);
         const processedInvitation: Invitation = {
           ...invitation,
@@ -205,7 +195,7 @@ async function processInvitations(
           // biome-ignore lint/style/useNamingConvention: This is from an external library
           invitee_user_id: user,
           // biome-ignore lint/style/useNamingConvention: This is from an external library
-          domain_id: domainId,
+          domain_id: workspaceId,
         };
 
         processedInvitations.push(processedInvitation);
@@ -218,12 +208,12 @@ async function processInvitations(
   return invitations;
 }
 
-export const GetDomainInvitations = async (queryParams: InvitationPageMeta) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+export const GetWorkspaceInvitations = async (queryParams: InvitationPageMeta) => {
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const invitationsPage = await mgSdk.Domains.ListDomainInvitations(
       queryParams,
-      domainId,
+      workspaceId,
       accessToken,
     );
     const invitations = await processInvitations(

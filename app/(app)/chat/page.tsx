@@ -1,9 +1,8 @@
 import { getServerSession } from "@/lib/nextauth";
-import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
-import { ListDomainUsers, ListWorkspaces } from "@/lib/workspace";
+import { ListWorkspaceUsers, ListWorkspaces } from "@/lib/workspace";
 import ChatPage from "@/components/chat/chat-page";
 import { Member } from "@/types/entities";
-import { GetDomainInvitations } from "@/lib/invitations";
+import { GetWorkspaceInvitations } from "@/lib/invitations";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { ListChannels } from "@/lib/channels";
 import { UserProfile } from "@/lib/users";
@@ -24,7 +23,7 @@ export default async function Page({ searchParams }: Props) {
     return <div>{workspaces.error}</div>;
   }
   const workspaceId = session?.workspace?.id as string;
-  const memResponse = await ListDomainUsers(workspaceId,
+  const memResponse = await ListWorkspaceUsers(workspaceId,
     {
       offset: 0,
       limit: 100,
@@ -32,7 +31,7 @@ export default async function Page({ searchParams }: Props) {
   );
   const searchParamsValue = await searchParams;
   const status = searchParamsValue?.status || "pending";
-  const inviResponse = await GetDomainInvitations({
+  const inviResponse = await GetWorkspaceInvitations({
     offset: 0,
     limit: 100,
     state: status,
@@ -44,11 +43,6 @@ export default async function Page({ searchParams }: Props) {
   const user = await UserProfile(session.accessToken);
 
   return (
-    <div className="h-screen flex bg-gray-100">
-      <WorkspaceSwitcher
-        selectedWorkspaceId={session?.workspace?.id as string}
-        workspaces={workspaces.data}
-      />
       <ChatPage
         session={session}
         members={memResponse.data?.members as Member[]}
@@ -56,6 +50,5 @@ export default async function Page({ searchParams }: Props) {
         dmChannelId={dmChannelId as string} 
         user={user.data as User}
         />
-    </div>
   );
 }
