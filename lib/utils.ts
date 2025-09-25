@@ -100,13 +100,6 @@ export function toSentenseCase(val: string) {
   return val.charAt(0).toUpperCase() + val.slice(1);
 }
 
-export function extractImageUuid(url: string): string | null {
-  const match = url.match(
-    /\/image\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})/,
-  );
-  return match ? (match[1] as string) : "";
-}
-
 export const lightDialogTheme = {
   base00: "#ffffff", // Default background color
   base01: "#f5f5f5",

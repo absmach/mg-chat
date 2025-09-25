@@ -5,7 +5,6 @@ import SDK, {
 } from "@absmach/magistrala-sdk";
 import camelcaseKeysDeep from "camelcase-keys-deep";
 import { decodeJwt } from "jose";
-
 import { sdkConf } from "@/lib/magistrala";
 import {
   decodeSessionToken,

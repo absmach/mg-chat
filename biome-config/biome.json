@@ -47,7 +47,8 @@
                 "recommended": true,
                 "noConsole": "off",
                 "noEvolvingTypes": "off",
-                "noReactSpecificProps": "off"
+                "noReactSpecificProps": "off",
+                "noUnknownAtRules":"off"
             }
         },
         "includes": []

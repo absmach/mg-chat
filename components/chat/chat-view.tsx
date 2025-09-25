@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
-import { Channel, ChannelsPage, Client, User } from "@absmach/magistrala-sdk";
+import { Channel, Client, User } from "@absmach/magistrala-sdk";
 import { ListChannelMembers, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
@@ -38,14 +38,12 @@ export function ChatView({
   const dmTopic = getDMTopic(userId as string, selectedDM as string);
   const { messages, setMessages, sendMessage, connect, setActiveTopic } = useWebSocket();
   const { workspace } = session;
-  const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Client[]>([]);
   const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
-      setIsLoading(true)
       if (channelInfo?.id && !selectedDM) {
         const response = await GetMessages({
           id: channelInfo?.id as string,
@@ -58,7 +56,6 @@ export function ChatView({
         });
 
         if (response.data) {
-          setIsLoading(false)
           setMessages(response.data.messages);
         }
         return;
@@ -80,7 +77,6 @@ export function ChatView({
           setMessages(response.data.messages);
         }
       }
-      setIsLoading(false)
     };
 
     fetchMessages();
