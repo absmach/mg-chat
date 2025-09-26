@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button"; // adjust path if needed
-import { LogOut } from "lucide-react"; // or wherever you're importing from
-import { signOut } from "next-auth/react"; // assuming you're using next-auth
+import { Button } from "@/components/ui/button"; 
+import { LogOut } from "lucide-react"; 
+import { signOut } from "next-auth/react";
 
 export const Logout = () => {
     const router = useRouter();

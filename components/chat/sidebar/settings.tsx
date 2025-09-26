@@ -2,7 +2,7 @@
 
 import  { InvitationsDialog }  from "@/components/invitations/invitation-dialog";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { InvitationsPage } from "@absmach/magistrala-sdk";
 import { SettingsIcon } from "lucide-react";
 import { useRouter } from "next/navigation";

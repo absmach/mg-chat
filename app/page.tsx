@@ -1,12 +1,12 @@
-import { getServerSession } from "@/lib/nextauth";
-import { ListWorkspaces } from "@/lib/workspace";
+import type { Invitation } from "@absmach/magistrala-sdk";
 import { Users } from "lucide-react";
+import { Logout } from "@/components/chat/sidebar/logout";
+import { NotificationsBell } from "@/components/invitations/view-invitations";
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
 import { WorkspaceCard } from "@/components/workspace/workspace-card";
-import { NotificationsBell } from "@/components/invitations/view-invitations";
 import { GetUserInvitations } from "@/lib/invitations";
-import { Invitation } from "@absmach/magistrala-sdk";
-import { Logout } from "@/components/chat/sidebar/logout";
+import { getServerSession } from "@/lib/nextauth";
+import { ListWorkspaces } from "@/lib/workspace";
 
 export default async function Home() {
   const response = await ListWorkspaces({
@@ -23,7 +23,6 @@ export default async function Home() {
     offset: 0,
     limit: 20,
     state: "pending",
-    // biome-ignore lint/style/useNamingConvention: This is from an external library
     invitee_user_id: session?.user?.id,
   });
 
@@ -40,7 +39,11 @@ export default async function Home() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <NotificationsBell invitations={invitationResponse?.data?.invitations as Invitation[]} />
+            <NotificationsBell
+              invitations={
+                invitationResponse?.data?.invitations as Invitation[]
+              }
+            />
             <Logout />
           </div>
         </div>

@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/auth-provider";
-import { WebSocketProvider } from "@/components/providers/socket-provider";
 import SessionProvider from "@/components/providers/next-auth-provider";
+import { WebSocketProvider } from "@/components/providers/socket-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +32,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider basePath={process.env.MG_NEXTAUTH_BASE_PATH}>
-        <AuthProvider>
-          <WebSocketProvider>{children}</WebSocketProvider>
-          <Toaster />
-        </AuthProvider>
+          <AuthProvider>
+            <WebSocketProvider>{children}</WebSocketProvider>
+            <Toaster />
+          </AuthProvider>
         </SessionProvider>
       </body>
     </html>

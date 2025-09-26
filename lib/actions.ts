@@ -8,7 +8,7 @@ import { Domain, MemberRolesPage, PageMetadata } from "@absmach/magistrala-sdk";
 import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { RefreshToken, UserProfile, ViewUser } from "./users";
+import { UserProfile, ViewUser } from "./users";
 import { GetWorkspaceInfo } from "./workspace";
 import { UserInfo, UserRole } from "@/types/auth";
 import { HttpError } from "@/types/errors";
@@ -244,90 +244,6 @@ export const UpdateServerSession = async (): Promise<string | undefined> => {
       refreshToken: decodedToken.refreshToken,
       refreshTokenExpiry: getTokenExpiry(decodedToken.refreshToken as string),
       accessTokenExpiry: getTokenExpiry(decodedToken.accessToken as string),
-    });
-
-    cookiesStore.set({
-      name: cookiesSessionKey,
-      value: updatedSession,
-      httpOnly: true,
-      path: "/",
-      secure: secure,
-    });
-  } catch (err) {
-    const knownError = err as HttpError;
-    const error =
-      knownError.error || knownError.message || knownError.toString();
-    throw new Error(error);
-  }
-};
-
-export const UpdateUserSession = async (): Promise<string | undefined> => {
-  try {
-    const cookiesStore = await cookies();
-    const headersList = await headers();
-
-    const proto = headersList.get("x-forwarded-proto");
-    const secure = proto === "https";
-
-    const cookiesSessionKey =
-      proto === "https"
-        ? "__Secure-next-auth.session-token"
-        : "next-auth.session-token";
-    const cookiesCsrfKey =
-      proto === "https"
-        ? "__Host-next-auth.csrf-token"
-        : "next-auth.csrf-token";
-
-    const csrfTokenCookie = cookiesStore.get(cookiesCsrfKey);
-    const sessionTokenCookie = cookiesStore.get(cookiesSessionKey);
-    const decodedToken = await decodeSessionToken(
-      csrfTokenCookie?.value as string,
-      sessionTokenCookie?.value as string,
-    );
-    if (!decodedToken) {
-      return;
-    }
-
-    const tokenResponse = await RefreshToken(
-      decodedToken.refreshToken as string,
-    );
-    if (tokenResponse.error !== null) {
-      return;
-    }
-
-    const tokens = tokenResponse.data;
-
-    const userResponse = await UserProfile(tokens.access_token);
-    if (userResponse.error !== null) {
-      return;
-    }
-    const user = userResponse.data;
-
-    const allowUnverifiedUser =
-      process.env.MG_UI_ALLOW_UNVERIFIED_USER === "true";
-
-    const updatedSession = await encodeSessionToken({
-      ...tokens,
-      user: {
-        id: user.id as string,
-        username: user.credentials?.username as string,
-        // biome-ignore lint/style/useNamingConvention: This is from an external library
-        first_name: user.first_name as string,
-        // biome-ignore lint/style/useNamingConvention: This is from an external library
-        last_name: user.last_name as string,
-        email: user.email as string,
-        image: user.profile_picture,
-        role: user.role,
-        verified:
-          allowUnverifiedUser ||
-          validateTime(user.verified_at) ||
-          user.role === UserRole.Admin,
-      } as UserInfo,
-
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
-      refreshTokenExpiry: getTokenExpiry(tokens.refresh_token as string),
-      accessTokenExpiry: getTokenExpiry(tokens.access_token as string),
     });
 
     cookiesStore.set({

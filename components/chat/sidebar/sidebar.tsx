@@ -195,11 +195,6 @@ export function Sidebar({
                           {(dmUser.credentials?.username as string).charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      {/* <div
-                        className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-gray-800 ${
-                          dmUser.isOnline ? "bg-green-500" : "bg-gray-400"
-                        }`}
-                      /> */}
                     </div>
                     <span className="text-sm truncate">{dmUser.credentials?.username}</span>
                   </Button>

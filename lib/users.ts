@@ -90,23 +90,6 @@ export const SearchUsers = async (queryParams: PageMetadata) => {
   }
 };
 
-export const RefreshToken = async (refreshToken: string) => {
-  try {
-    const response = await mgSdk.Users.RefreshToken(refreshToken);
-
-    return {
-      data: response,
-      error: null,
-    };
-  } catch (err: unknown) {
-    const knownError = err as HttpError;
-    return {
-      data: null,
-      error: knownError.error || knownError.message || knownError.toString(),
-    };
-  }
-};
-
 export const UpdateUserEmail = async (user: User) => {
   try {
     const { accessToken } = await validateOrGetToken("");

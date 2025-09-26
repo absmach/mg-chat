@@ -261,7 +261,6 @@ type UpdateNameProps = {
             error: string;
         }
     >;
-    updateGroup?: (name: string) => void;
     disabled?: boolean;
 };
 
@@ -270,7 +269,6 @@ export function UpdateNameRow({
     id,
     entity,
     updateName,
-    updateGroup,
     disabled,
 }: UpdateNameProps) {
     const [isEditing, setIsEditing] = useState(false);

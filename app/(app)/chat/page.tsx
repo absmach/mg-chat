@@ -1,11 +1,11 @@
-import { getServerSession } from "@/lib/nextauth";
-import { ListWorkspaceUsers, ListWorkspaces } from "@/lib/workspace";
+import type { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import ChatPage from "@/components/chat/chat-page";
-import { Member } from "@/types/entities";
-import { GetWorkspaceInvitations } from "@/lib/invitations";
-import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { ListChannels } from "@/lib/channels";
+import { GetWorkspaceInvitations } from "@/lib/invitations";
+import { getServerSession } from "@/lib/nextauth";
 import { UserProfile } from "@/lib/users";
+import { ListWorkspaces, ListWorkspaceUsers } from "@/lib/workspace";
+import type { Member } from "@/types/entities";
 
 export type Props = {
   searchParams?: Promise<{
@@ -23,12 +23,10 @@ export default async function Page({ searchParams }: Props) {
     return <div>{workspaces.error}</div>;
   }
   const workspaceId = session?.workspace?.id as string;
-  const memResponse = await ListWorkspaceUsers(workspaceId,
-    {
-      offset: 0,
-      limit: 100,
-    },
-  );
+  const memResponse = await ListWorkspaceUsers(workspaceId, {
+    offset: 0,
+    limit: 100,
+  });
   const searchParamsValue = await searchParams;
   const status = searchParamsValue?.status || "pending";
   const inviResponse = await GetWorkspaceInvitations({
@@ -43,12 +41,12 @@ export default async function Page({ searchParams }: Props) {
   const user = await UserProfile(session.accessToken);
 
   return (
-      <ChatPage
-        session={session}
-        members={memResponse.data?.members as Member[]}
-        invitationsPage={inviResponse?.data as InvitationsPage}
-        dmChannelId={dmChannelId as string} 
-        user={user.data as User}
-        />
+    <ChatPage
+      session={session}
+      members={memResponse.data?.members as Member[]}
+      invitationsPage={inviResponse?.data as InvitationsPage}
+      dmChannelId={dmChannelId as string}
+      user={user.data as User}
+    />
   );
 }

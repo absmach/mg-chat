@@ -1,7 +1,6 @@
 "use server";
 
 import type { Channel } from "@absmach/magistrala-sdk";
-
 import { revalidatePath } from "next/cache";
 import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";

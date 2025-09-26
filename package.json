@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "biome check --error-on-warnings app",
+    "lint:fix": "biome check --write app",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@absmach/magistrala-sdk": "^0.17.6",
@@ -55,6 +57,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.4",
     "@tailwindcss/postcss": "^4",
     "@types/camelcase-keys-deep": "^0.1.2",
     "@types/luxon": "^3.7.1",
