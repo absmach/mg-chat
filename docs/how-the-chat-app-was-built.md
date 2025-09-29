@@ -2,18 +2,18 @@
 
 ## Introduction
 
-In today's fast-paced digital world, effective communication is the backbone of successful teams and organizations. As part of our journey to explore modern web development and IoT integration, we embarked on building SuperMQ Chat—a collaborative messaging platform that leverages the power of Next.js and the Magistrala SDK.
+In today's fast-paced digital world, effective communication is the backbone of successful teams and organizations. As part of our journey to explore modern web development and IoT integration, we embarked on building SuperMQ Chat, a collaborative messaging platform that leverages the power of Next.js and the Magistrala SDK.
 
 SuperMQ Chat is more than just another chat application; it's a demonstration of how cutting-edge technologies can come together to create a seamless, real-time communication experience. In this post, I'll walk you through the entire process of building this app, from conception to deployment, sharing the challenges we faced and the lessons we learned along the way.
 
 ## The Vision: What We Set Out to Build
 
-Our goal was to create a chat application that could handle multiple workspaces, support real-time messaging, and integrate seamlessly with IoT devices through the Magistrala platform. Key requirements included:
+Our goal was to create a chat application that could handle multiple workspaces, support real time messaging, and integrate seamlessly with IoT devices through the Magistrala platform. Key requirements included:
 
 - Multi-workspace support for organizing different teams or projects
-- Real-time messaging with instant delivery
+- Real time messaging with instant delivery
 - Secure user authentication and authorization
-- Channel-based conversations within workspaces
+- Channel based conversations within workspaces
 - User invitation system
 - Responsive design for all devices
 - Integration with Magistrala for IoT capabilities
@@ -60,7 +60,6 @@ We adopted a modular architecture that separated concerns and made the codebase 
 At the root of our application, we wrapped everything in multiple providers:
 
 ```typescript
-// app/layout.tsx
 <SessionProvider>
   <AuthProvider>
     <WebSocketProvider>
@@ -105,7 +104,6 @@ Workspaces are the top-level organizational unit in SuperMQ Chat. We implemented
 Real-time messaging was achieved through WebSocket connections:
 
 ```typescript
-
 const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
@@ -215,4 +213,4 @@ Have you built any real-time applications? I'd love to hear about your experienc
 
 ---
 
-*This post was written by the SuperMQ Chat development team: Felister Wambui.
+*This post was written by: Felister Wambui.
