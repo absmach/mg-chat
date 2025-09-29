@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
+import { Menu, Hash, MessageCircle, EllipsisVertical, Bell, BellOff } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
 import { Channel, ChannelsPage, Client, User } from "@absmach/magistrala-sdk";
 import { ListChannelMembers, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
-import { UserProfile, ViewUser } from "@/lib/users";
+import { UpdateUser, UserProfile, ViewUser } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
+import { Badge } from "../ui/badge";
+import { useMessageNotifications } from "../hooks/use-message-notifications";
+import { useWindowFocus } from "../hooks/use-window-focus";
 
 interface Props {
   selectedChannel: string | null;
@@ -29,7 +32,7 @@ export function ChatView({
   workspaceId,
   dmChannelId,
 }: Props) {
-  const [userId, setUserId] = useState(session?.user?.id);
+  const [userId, setUserId] = useState(session?.user?.id as string);
   const getDMTopic = (userId1: string, userId2: string): string => {
     const sortedIds = [userId1, userId2].sort();
     return `${sortedIds[0]}-${sortedIds[1]}`;
@@ -42,6 +45,46 @@ export function ChatView({
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [members, setMembers] = useState<Client[]>([]);
   const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null); 
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (userId) {
+        const response = await ViewUser(userId);
+        if (response.data) {
+          setUser(response.data);
+        }
+      }
+    };
+    fetchUser();
+  }, [userId]);
+
+  // --- 🔹 Helper: update lastReadAt in metadata
+  const updateLastReadAt = useCallback (async (chatId: string, time: number) => {
+    if (!user) return;
+
+    const updatedMetadata = {
+      ...user.metadata,
+      ui: {
+        ...user.metadata?.ui,
+        lastRead: {
+          ...(user.metadata?.ui?.lastRead || ""),
+          [chatId]: time,
+        },
+      },
+    };
+
+    const updatedUser: User = {
+      ...user,
+      metadata: updatedMetadata,
+    };
+
+    const response = await UpdateUser(updatedUser);
+    if (response.data) {
+      setUser(response.data);
+    }
+  }, [user, setUser]);
+
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -176,6 +219,23 @@ export function ChatView({
     getMembers();
   }, [selectedChannel, workspaceId]);
 
+  const isWindowFocused = useWindowFocus()
+
+  // const { lastReadMessageIndex, unreadCount, markAsRead, markAllAsRead } = useMessageNotifications({
+  //   messages,
+  //   userId,
+  //   isWindowFocused,
+  // })
+
+  useEffect(() => {
+    if (isWindowFocused && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      const lastTime = lastMessage?.time as number;
+      updateLastReadAt(selectedChannel || selectedDM || "", lastTime);
+    }
+  }, [isWindowFocused, messages, updateLastReadAt, selectedChannel, selectedDM]);
+
+  console.log("user", user);
   if (!selectedChannel && !selectedDM) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -196,12 +256,12 @@ export function ChatView({
   return (
     <div className="flex-1 flex flex-col bg-white">
       <div className="border-b px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
+        {/* <div className="flex items-center space-x-3">
           <Button variant="ghost" size="sm" className="lg:hidden">
             <Menu className="h-5 w-5" />
-          </Button>
+          </Button> */}
 
-          {selectedDM ? (
+        {/* {selectedDM ? (
             <>
               <MessageCircle className="h-5 w-5 text-gray-500" />
               <div>
@@ -218,15 +278,95 @@ export function ChatView({
                     {members?.length} {members?.length === 1 ? "member" : "members"}
                   </p>
                 )}
+                  {unreadCount > 0 && (
+                    <Badge variant="destructive" className="ml-2">
+                      {unreadCount}
+                    </Badge>
+                  )}
               </div>
             </>
-          )}
+          )} */}
+        {/* </div> */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center gap-2">
+            {/* {selectedChannel ? (
+              <>
+              <Hash className="h-5 w-5 text-muted-foreground" />
+              <h1 className="font-semibold text-lg">{channelInfo?.name}</h1>
+              </>
+            ) : (
+              <>
+                <MessageCircle className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <h2 className="font-semibold text-gray-900">{dmUserInfo?.credentials?.username}</h2>
+                </div>
+              </>
+            )} */}
+            {selectedDM ? (
+              <>
+                <MessageCircle className="h-5 w-5 text-gray-500" />
+                <div>
+                  <h2 className="font-semibold text-gray-900">{dmUserInfo?.credentials?.username}</h2>
+                </div>
+              </>
+            ) : (
+              <>
+                <Hash className="h-5 w-5 text-gray-500" />
+                <div>
+                  <h2 className="font-semibold text-gray-900">{channelInfo?.name}</h2>
+                  {channelInfo?.tags?.includes("chat") && (
+                    <p className="text-xs text-gray-500">
+                      {members?.length} {members?.length === 1 ? "member" : "members"}
+                    </p>
+                  )}
+                  {/* {unreadCount > 0 && (
+                    <Badge variant="destructive" className="ml-2">
+                      {unreadCount}
+                    </Badge>
+                  )} */}
+                </div>
+              </>
+            )}
+            {/* {unreadCount > 0 && (
+              <Badge variant="destructive" className="ml-2">
+                {unreadCount}
+              </Badge>
+            )} */}
+          </div>
         </div>
-        <EllipsisVertical className="h-4 w-4" />
+
+        {/* <EllipsisVertical className="h-4 w-4" /> */}
+        <div className="flex items-center gap-2">
+          {/* <Button
+            variant="ghost"
+            size="icon"
+            onClick={markAllAsRead}
+            title={unreadCount > 0 ? "Mark all as read" : "No unread messages"}
+          >
+            {unreadCount > 0 ? (
+              <Bell className="h-5 w-5 text-orange-500" />
+            ) : (
+              <BellOff className="h-5 w-5 text-muted-foreground" />
+            )}
+          </Button> */}
+          <EllipsisVertical className="h-4 w-4" />
+        </div>
       </div>
 
+
+
       <div className="flex-1 flex flex-col">
-        <MessageList messages={messages} userId={userId as string} />
+        {/* <MessageList messages={messages} userId={userId as string} /> */}
+        <MessageList
+          messages={messages}
+          userId={userId}
+          // lastReadMessageIndex={lastReadMessageIndex}
+          // onMarkAsRead={markAsRead}
+          lastReadAt={user?.metadata?.ui?.lastRead?.[selectedChannel || dmChannelId]}
+        />
 
         <div className="border p-6 m-4 rounded-md">
           <MessageInput onSendMessage={handleSend} />
