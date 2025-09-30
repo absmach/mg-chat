@@ -36,7 +36,7 @@ MG Chat is a collaborative communication platform designed for teams and organiz
    pnpm install
    ```
 
-3. Configure Magistrala backend connection (refer to [Magistrala documentation](https://docs.magistrala.abstractmachines.fr/) for setup)
+3. Configure Magistrala (refer to [Magistrala documentation](https://docs.magistrala.abstractmachines.fr/) for setup)
 
 ## Usage
 
