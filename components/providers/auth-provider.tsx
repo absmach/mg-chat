@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
-      } catch (error) {
+      } catch (_error) {
         localStorage.removeItem("auth-token");
         localStorage.removeItem("user-data");
       }

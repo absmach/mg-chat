@@ -7,19 +7,16 @@ import { SenMLMessage } from "@absmach/magistrala-sdk";
 
 interface MessageListProps {
   messages: SenMLMessage[];
-  onReaction?: (messageId: string, emoji: string) => void;
   userId?: string;
 }
 
 export function MessageList({
   messages,
-  onReaction,
   userId,
 }: MessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Auto-scroll to bottom when new messages arrive
     if (scrollAreaRef.current) {
       const scrollContainer = scrollAreaRef.current.querySelector(
         "[data-radix-scroll-area-viewport]"
@@ -34,12 +31,7 @@ export function MessageList({
     <ScrollArea ref={scrollAreaRef} className="max-h-[80vh] flex-1 px-4">
       <div className="space-y-4 py-4">
         {messages.map((message, index) => {
-          const previousMessage = messages[index - 1];
           const isMine = message.publisher === userId;
-          // const showAvatar =
-          //   !previousMessage ||
-          //   previousMessage.author.id !== message.author.id ||
-          //   message.timestamp.getTime() - previousMessage.timestamp.getTime() > 300000 // 5 minutes
 
           return (
             <div
