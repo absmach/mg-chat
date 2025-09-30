@@ -1,10 +1,10 @@
-# SuperMQ Chat
+# MG Chat
 
 A modern, real-time chat application built with Next.js, featuring multi-workspace support, secure authentication, and seamless messaging powered by the Magistrala.
 
 ## Overview
 
-SuperMQ Chat is a collaborative communication platform designed for teams and organizations. It leverages the Magistrala IoT platform's SDK to provide robust backend services, enabling secure, scalable, and real-time messaging across multiple workspaces and channels.
+MG Chat is a collaborative communication platform designed for teams and organizations. It leverages the Magistrala IoT platform's SDK enabling secure, scalable, and real-time messaging across multiple workspaces, channels and users.
 
 ## Features
 
@@ -19,7 +19,7 @@ SuperMQ Chat is a collaborative communication platform designed for teams and or
 ## Prerequisites
 
 - Node.js 18+ and PNPM
-- Magistrala backend instance (for full functionality)
+- Magistrala (for full functionality)
 
 ## Installation
 
@@ -36,7 +36,7 @@ SuperMQ Chat is a collaborative communication platform designed for teams and or
    pnpm install
    ```
 
-3. Configure Magistrala backend connection (refer to Magistrala documentation for setup)
+3. Configure Magistrala backend connection (refer to [Magistrala documentation](https://docs.magistrala.abstractmachines.fr/) for setup)
 
 ## Usage
 
@@ -45,7 +45,7 @@ SuperMQ Chat is a collaborative communication platform designed for teams and or
 Run the development server:
 
 ```bash
-pnpm dev
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
@@ -55,14 +55,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Build the application for production:
 
 ```bash
-pnpm build
-pnpm start
+pnpm run build
+pnpm run start
 ```
 
 ## Contributing
 
 Thank you for your interest in Magistrala and the desire to contribute!
 
-1. Take a look at our [open issues](https://github.com/absmach/magistrala-docs/issues). The [good-first-issue](https://github.com/absmach/magistrala-docs/labels/good-first-issue) label is specifically for issues that are great for getting started.
-2. Check out the [contribution guide](CONTRIBUTING.md) to learn more about our style and conventions.
-3. Make your changes compatible with our workflow.
+1. Take a look at our [open issues](https://github.com/absmach/mg-chat/issues).
+2. Make your changes compatible with our workflow.
