@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Hash } from "lucide-react";
-import { Session } from "@/types/auth";
+import { Session, UserRole } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
@@ -16,6 +16,7 @@ import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
 import { NotificationsBell } from "@/components/invitations/view-invitations";
 import { GetUserInvitations } from "@/lib/invitations";
+import { ChatMemberActions } from "@/lib/data";
 
 interface Props {
   session: Session;
@@ -46,10 +47,11 @@ export function Sidebar({
   const [invitations, setInvitations] = useState<Invitation[]>([]);
 
   const workspaceId = session.workspace?.id;
+  const roles = session.workspace?.roles;
 
   const getData = useCallback(async () => {
     const groupResponse = await ListChannels({
-      queryParams: { offset: 0, limit: 100, tag: "chat" },
+      queryParams: { offset: 0, limit: 100, tag: "chat", actions: ChatMemberActions, user_id: session.user?.id },
     });
     if (groupResponse.data) {
       setChannels(groupResponse.data.channels);
@@ -122,8 +124,13 @@ export function Sidebar({
             <p className="text-xs text-gray-300 truncate">{workspace?.route}</p>
           </div> 
         </Button>
-        <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} />
-        <NotificationsBell invitations={invitations} isSidebar={true} className="mt-4 ml-4"/>
+        {roles?.some((role) => role.role_name === "admin") && (
+          <Settings
+            workspaceId={workspace?.id as string}
+            invitationsPage={invitationsPage}
+          />
+        )}
+      <NotificationsBell invitations={invitations} isSidebar={true} className="mt-4 ml-4"/>
       </div>
 
       <ScrollArea className="flex-1">
@@ -201,7 +208,7 @@ export function Sidebar({
                 );
               })}
             </div>
-            <InviteMember workspaceId={workspaceId as string} />
+            {roles?.some((role) => role.role_name === "admin") && <InviteMember workspaceId={workspaceId as string} />}
           </div>
         </div>
       </ScrollArea>

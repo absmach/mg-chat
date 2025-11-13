@@ -1,9 +1,10 @@
 "use server";
 
-import type { Channel } from "@absmach/magistrala-sdk";
+import type { Channel, RolePage } from "@absmach/magistrala-sdk";
 import { revalidatePath } from "next/cache";
 import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
+import { ProcessRoles } from "./workspace";
 
 export const CreateChannel = async (channel: Channel, workspaceId: string) => {
   const { accessToken } = await validateOrGetToken("");
