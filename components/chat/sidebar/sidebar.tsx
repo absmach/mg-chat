@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, SetStateAction, Dispatch } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,6 +16,8 @@ import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
 import { NotificationsBell } from "@/components/invitations/view-invitations";
 import { GetUserInvitations } from "@/lib/invitations";
+import { InAppNotification } from "@/components/providers/socket-provider";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   session: Session;
@@ -27,6 +29,8 @@ interface Props {
   invitationsPage: InvitationsPage;
   dmChannelId: string;
   user: User;
+  notifications: InAppNotification[];
+  setNotifications: Dispatch<SetStateAction<InAppNotification[]>>
 }
 
 export function Sidebar({
@@ -39,6 +43,8 @@ export function Sidebar({
   invitationsPage,
   dmChannelId,
   user,
+  notifications,
+  setNotifications,
 }: Props) {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [revalidate, setRevalidate] = useState(false);
@@ -154,6 +160,7 @@ export function Sidebar({
                 >
                   <Hash className="h-4 w-4 mr-2" />
                   <span className="text-sm">{channel.name}</span>
+                  <Badge variant="outline">{notifications.length}</Badge>
                 </Button>
                 </div>
               ))}
@@ -173,6 +180,7 @@ export function Sidebar({
               {members?.map((dmUser) => {
                 
                 return (
+                  <>
                   <Button
                     key={dmUser.id}
                     variant="ghost"
@@ -198,6 +206,8 @@ export function Sidebar({
                     </div>
                     <span className="text-sm truncate">{dmUser.credentials?.username}</span>
                   </Button>
+                  <Badge variant="outline">{notifications.length}</Badge>
+                  </>
                 );
               })}
             </div>

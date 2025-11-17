@@ -13,6 +13,14 @@ import {
   useState,
 } from "react";
 
+export type InAppNotification = {
+  id: string;
+  topic: string;
+  senderId: string;
+  timestamp: number;
+  isRead: boolean;
+};
+
 type WebSocketContextType = {
   messages: SenMLMessage[];
   setMessages: Dispatch<SetStateAction<SenMLMessage[]>>;
@@ -20,6 +28,9 @@ type WebSocketContextType = {
   connect: (workspaceId: string, channelId: string) => void;
   disconnect: () => void;
   setActiveTopic: (topic: string | null) => void;
+  markNotificationsRead: (topic: string | null) => void;
+  notifications: InAppNotification[];
+  unreadCount: number;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -33,8 +44,12 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const user = useSession();
   const token = user?.data?.accessToken;
 
+  const [notifications, setNotifications] = useState<InAppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+
   const connect = (workspaceId: string, channelId: string) => {
-    const wsUrl = `ws://localhost:8186/m/${workspaceId}/c/${channelId}?authorization=Bearer%20${token}`;
+    const wsUrl = `ws://localhost:8186/m/${workspaceId}/c/${channelId}/?authorization=Bearer%20${token}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
@@ -65,6 +80,28 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
           );
           return [...prev, ...uniqueParsed];
         });
+
+        const newNotifications = parsed.filter((m) => m.n !== activeTopic);
+       
+        if (newNotifications.length > 0) {
+          setNotifications((prev) => {
+            const existingKeys = new Set(prev.map((n) => n.id));
+
+            // Create compact notification objects
+            const uniqueNotifs = newNotifications
+              .filter((m) => !existingKeys.has(`${m.n}-${m.t}`))
+              .map((m): InAppNotification => ({
+                id: `${m.n}-${m.t}`,
+                topic: m.n,
+                senderId: m.publisher ?? "unknown",
+                timestamp: m.t,
+                isRead: false,
+              }));
+            console.log("uniqueNotifs", uniqueNotifs);
+            return [...prev, ...uniqueNotifs];
+          });
+          setUnreadCount((prev) => prev + newNotifications.length);
+        }
       } catch (err) {
         console.error("Failed to parse message:", raw, err);
       }
@@ -96,6 +133,21 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const markNotificationsRead = (topic: string | null) => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.topic === topic ? { ...n, isRead: true } : n
+      )
+    );
+
+    setUnreadCount((prev) => {
+      return prev - notifications.filter(
+        (n) => n.topic === topic && !n.isRead
+      ).length;
+    });
+  };
+
+
   useEffect(() => {
     return () => {
       disconnect();
@@ -104,7 +156,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <WebSocketContext.Provider
-      value={{ messages, setMessages, sendMessage, connect, disconnect, setActiveTopic }}
+      value={{ messages, setMessages, sendMessage, connect, disconnect, setActiveTopic, markNotificationsRead, notifications, unreadCount }}
     >
       {children}
     </WebSocketContext.Provider>
