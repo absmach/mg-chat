@@ -6,6 +6,7 @@ import { Session } from "@/types/auth";
 import { useState } from "react";
 import { Member } from "@/types/entities";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
+import { InAppNotification } from "../providers/socket-provider";
 
 interface Props {
   session: Session;
@@ -17,6 +18,7 @@ interface Props {
 export default function ChatPage({ session, members, invitationsPage, dmChannelId, user }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(session?.user?.id as string);
+  const [notifications, setNotifications] = useState<InAppNotification[]>([]);
   const workspaceId = session.workspace
   return (
     <>
@@ -36,6 +38,8 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
           invitationsPage={invitationsPage}
           dmChannelId={dmChannelId as string} 
           user={user}
+          notifications={notifications}
+          setNotifications={setNotifications}
         />
       </div>
 

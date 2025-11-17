@@ -39,7 +39,7 @@ export function ChatView({
   };
 
   const dmTopic = getDMTopic(userId as string, selectedDM as string);
-  const { messages, setMessages, sendMessage, connect, setActiveTopic } = useWebSocket();
+  const { messages, setMessages, sendMessage, connect, setActiveTopic, notifications, unreadCount, markNotificationsRead } = useWebSocket();
   const { workspace } = session;
   const [isLoading, setIsLoading] = useState(false);
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
@@ -195,8 +195,10 @@ export function ChatView({
     if (selectedDM) {
       setMessages([])
       setActiveTopic(dmTopic);
+      markNotificationsRead(dmTopic);
     } else {
       setActiveTopic(null);
+      markNotificationsRead(null)
     }
   }, [selectedDM, dmTopic, setActiveTopic, setMessages]);
 
