@@ -22,7 +22,7 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
   return (
     <>
       <ResizablePanelGroup direction="horizontal" className="h-screen w-full">
-        <ResizablePanel defaultSize={15} minSize={10} maxSize={50}>
+        <ResizablePanel defaultSize={15} minSize={15} maxSize={50}>
           <Sidebar
             session={session}
             selectedChannel={selectedChannel}
